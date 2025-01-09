@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 import warnings
 from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
-from pytorch_lightning.loggers import MLFlowLogger
+from pytorch_lightning.loggers import MLFlowLogger, CSVLogger
 import pytorch_lightning as pl
 from pytorch_lightning.strategies import DDPStrategy
 from datasets.data_module import LightningDataModule
@@ -52,9 +52,12 @@ def main(args):
     pl.seed_everything(args.seed)
     
     # Create output directory
+    print("OUTPUT DIR")
+    print(args.output_dir)
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
     
     # Setup configs
+    print(args.dataset)
     dataset_config = dataset_config_registry.get(args.dataset)()
     model_config = model_config_registry.get(args.model)()
     
@@ -69,6 +72,10 @@ def main(args):
         run_name=f"{experiment_name}_run_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}",
         tracking_uri=f"file:{os.path.join(args.output_dir, 'mlruns')}"
     )
+    loggers = [
+        mlf_logger,
+        CSVLogger(args.output_dir)
+    ]
     
     # Callbacks
     model_monitor = "val_miou" if args.task=="segmentation" else "val_acc1"
@@ -86,12 +93,13 @@ def main(args):
     
     # Initialize trainer
     trainer = pl.Trainer(
-        logger=mlf_logger,
+        logger=loggers,
         callbacks=callbacks,
         strategy=DDPStrategy(find_unused_parameters=False) if args.strategy == "ddp" else args.strategy,
         devices="auto",
         max_epochs=args.epochs,
         num_sanity_val_steps=0,
+        default_root_dir=args.output_dir
     )
     
     # Initialize data module

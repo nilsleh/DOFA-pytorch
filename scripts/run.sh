@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5
-export CUDA_VISIBLE_DEVICES=5
+export CUDA_VISIBLE_DEVICES=0
 export GEO_BENCH_DIR=/home/xshadow/Datasets/geobench/
 
 model=$1        # Pass the model as the first argument
@@ -13,7 +13,7 @@ epochs=$6       # Pass the number of epochs as the sixth argument
 warmup_epochs=$7
 num_gpus=$(echo $CUDA_VISIBLE_DEVICES | tr ',' '\n' | wc -l)
 
-python src/main.py \
+/home/toolkit/.conda/envs/dofaEnv/bin/python src/main.py \
 --output_dir logs/"${model}_${dataset}" \
 --model $model \
 --dataset $dataset \

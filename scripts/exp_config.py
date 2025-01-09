@@ -13,7 +13,7 @@ experiments = [
         "lr": 0.002,
         "warmup_epochs": 3,
     },
-
+    
     {
         "model": "dinov2_seg",
         "dataset": "geobench_pv4ger_seg",

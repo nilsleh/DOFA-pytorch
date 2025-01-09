@@ -30,7 +30,7 @@ pip install pydantic
 pip install omegaconf
 pip install wandb
 pip install python-dotenv
-pip install torchgeo
+pip install git+https://github.com/microsoft/torchgeo.git
 pip install fastparquet
 ```
 
@@ -53,6 +53,7 @@ SATMAE++ weights are available in this [HF repo](https://huggingface.co/mubashir
 
 This repository includes the following models for evaluation:
 
+- AnySat
 - CROMA
 - DOFA
 - GFM

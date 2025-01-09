@@ -2,6 +2,9 @@ from foundation_models import CromaModel, ScaleMAEModel, GFMModel, DinoV2Model, 
 from datasets.geobench_wrapper import GeoBenchDataset
 from datasets.resisc_wrapper import Resics45Dataset
 from datasets.benv2_wrapper import BenV2Dataset
+from datasets.loveda_wrapper import LoveDADataset
+from datasets.caffe_wrapper import CaffeDataset
+from datasets.flair2_wrapper import Flair2Dataset
 import pdb
 
 model_registry = {
@@ -20,7 +23,10 @@ model_registry = {
 dataset_registry = {
     "geobench": GeoBenchDataset,
     "resisc45": Resics45Dataset,
-    "benv2": BenV2Dataset
+    "benv2": BenV2Dataset,
+    "loveda": LoveDADataset,
+    "caffe": CaffeDataset,
+    "flair2": Flair2Dataset,
     # Add other dataset mappings here
 }
 
