@@ -7,7 +7,8 @@ from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
 from pytorch_lightning.loggers import MLFlowLogger, CSVLogger
 import pytorch_lightning as pl
 from pytorch_lightning.strategies import DDPStrategy
-from datasets.data_module import LightningDataModule
+from datasets.data_module import BenchmarkDataModule
+from omegaconf import OmegaConf
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -51,9 +52,9 @@ def get_args_parser():
 def main(args):
     pl.seed_everything(args.seed)
     
-    # Create output directory
-    print("OUTPUT DIR")
-    print(args.output_dir)
+    # Create output directory adding timestamp to output dir
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    args.output_dir = args.output_dir + "_" + timestamp
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
     
     # Setup configs
@@ -69,7 +70,7 @@ def main(args):
     experiment_name = f"{args.model}_{args.dataset}"
     mlf_logger = MLFlowLogger(
         experiment_name=experiment_name,
-        run_name=f"{experiment_name}_run_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}",
+        run_name=f"{experiment_name}_run_{timestamp}",
         tracking_uri=f"file:{os.path.join(args.output_dir, 'mlruns')}"
     )
     loggers = [
@@ -103,7 +104,7 @@ def main(args):
     )
     
     # Initialize data module
-    data_module = LightningDataModule(
+    data_module = BenchmarkDataModule(
         dataset_config=dataset_config,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
@@ -112,6 +113,15 @@ def main(args):
     
     # Create model (assumed to be a LightningModule)
     model = create_model(args, model_config, dataset_config)
+
+    # Save arguments to config.yaml using OmegaConf
+    cfg = OmegaConf.create({
+        "args": vars(args),
+        "dataset_config": dataset_config.__dict__,
+        "model_config": model_config.__dict__,
+    })
+    config_path = os.path.join(args.output_dir, "config.yaml")
+    OmegaConf.save(config=cfg, f=config_path)
     
     # Train
     trainer.fit(model, data_module, ckpt_path=args.resume if args.resume else None)

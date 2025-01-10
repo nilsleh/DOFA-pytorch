@@ -1,5 +1,4 @@
 import os
-import datetime
 
 models = ["dinov2_seg", "gfm_seg", "satmae_seg_rgb"]
 experiments = [
@@ -103,8 +102,6 @@ def generate_bash_scripts(experiments, out_dir="."):
         task = exp["task"]
         warmup_epochs = exp.get("warmup_epochs", 0)
 
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-
         script_name = f"run_{model}_{dataset}.sh"
         script_path = os.path.join(dataset_dir, script_name)
 
@@ -126,7 +123,7 @@ warmup_epochs="{warmup_epochs}"
 num_gpus=$(echo $CUDA_VISIBLE_DEVICES | tr ',' '\\n' | wc -l)
 
 /home/toolkit/.conda/envs/dofaEnv/bin/python src/main.py \\
---output_dir /mnt/results/nils/exps/${{model}}_${{dataset}}_{timestamp} \\
+--output_dir /mnt/results/nils/exps/${{model}}_${{dataset}} \\
 --model ${{model}} \\
 --dataset ${{dataset}} \\
 --task ${{task}} \\
