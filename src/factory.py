@@ -1,4 +1,4 @@
-from foundation_models import CromaModel, ScaleMAEModel, GFMModel, DinoV2Model, SoftConModel, DofaModel, SatMAEModel, AnySatModel
+from foundation_models import CromaModel, ScaleMAEModel, GFMModel, DinoV2Model, SoftConModel, DofaModel, SatMAEModel, AnySatModel, RCFModel
 from datasets.geobench_wrapper import GeoBenchDataset
 from datasets.resisc_wrapper import Resics45Dataset
 from datasets.benv2_wrapper import BenV2Dataset
@@ -17,6 +17,7 @@ model_registry = {
     "dofa": DofaModel,
     "satmae":SatMAEModel,
     "anysat": AnySatModel,
+    "rcf": RCFModel,
     # Add other model mappings here
 }
 

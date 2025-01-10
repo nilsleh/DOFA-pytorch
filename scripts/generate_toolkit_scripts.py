@@ -85,6 +85,44 @@ experiments = [
         "lr": 0.002,
         "warmup_epochs": 3,
     },
+    # RCF
+    {
+        "model": "rcf_seg",
+        "dataset": "flair2_rgb",
+        "task": "segmentation",
+        "batch_size": 16,
+        "epochs": 30,
+        "lr": 0.002,
+        "warmup_epochs": 3,
+    },
+    {
+        "model": "rcf_seg",
+        "dataset": "loveda_rgb",
+        "task": "segmentation",
+        "batch_size": 16,
+        "epochs": 30,
+        "lr": 0.002,
+        "warmup_epochs": 3,
+    },
+    {
+        "model": "rcf_seg",
+        "dataset": "caffe_rgb",
+        "task": "segmentation",
+        "batch_size": 16,
+        "epochs": 30,
+        "lr": 0.002,
+        "warmup_epochs": 3,
+    },
+    {
+        "model": "rcf_cls",
+        "dataset": "benv2_rgb",
+        "task": "classification",
+        "batch_size": 16,
+        "epochs": 30,
+        "lr": 0.002,
+        "warmup_epochs": 3,
+    },
+    
 ]
 
 

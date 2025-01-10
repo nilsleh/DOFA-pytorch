@@ -1372,6 +1372,29 @@ class GFM_cls_Config(BaseModelConfig):
     class Config:
         validate_assignment = True
 
+class RCF_cls_Config(BaseModelConfig):
+    task: str = "classification"
+    model_type: str = "rcf"
+    features: int = 256
+    kernel_size: int = 3
+    bias: float = -1.0
+    seed: int = 0
+    mode: str = "gaussian"
+    num_scales: int = 1
+    spatial_dim: int = 1
+
+class RCF_seg_Config(BaseModelConfig):
+    task: str = "segmentation"
+    model_type: str = "rcf"
+    features: int = 256
+    kernel_size: int = 3
+    bias: float = -1.0
+    seed: int = 0
+    mode: str = "gaussian"
+    num_scales: int = 4
+    spatial_dim: int = 32
+    
+
 
 model_config_registry = {
     "croma_cls": CROMA_cls_Config,
@@ -1396,4 +1419,6 @@ model_config_registry = {
     "satmae_cls": SatMAE_cls_Config,
     "satmae_cls_rgb": SatMAE_cls_rgb_Config,
     "satmae_seg_rgb": SatMAE_seg_rgb_Config,
+    "rcf_cls": RCF_cls_Config,
+    "rcf_seg": RCF_seg_Config
 }
