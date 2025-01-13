@@ -112,6 +112,9 @@ class BigEarthNetv2(BigEarthNet):
         dir_maps = self.metadata_locs["maps"]["directory"]
 
         self.metadata = pd.read_parquet(os.path.join(self.root, filename))
+        # replace "validation" with "val" in split column
+        self.metadata["split"] = self.metadata["split"].replace("validation", "val")
+        self.metadata = self.metadata[self.metadata["split"] == self.split].reset_index()
 
         def construct_folder_path(root, dir, patch_id, remove_last: int = 2):
             tile_id = "_".join(patch_id.split("_")[:-remove_last])
@@ -321,6 +324,14 @@ class BenV2Dataset:
             bands=self.input_bands,
             transforms=eval_transform,
         )
+
+        num_subset_samples = int(0.1 * len(dataset_val))
+        # Split the dataset into the subset and the remaining part
+        subset_val, _ = random_split(
+            dataset_val,
+            [num_subset_samples, len(dataset_val) - num_subset_samples],
+            generator=Generator().manual_seed(42),
+        )
         dataset_test = BigEarthNetv2(
             root=self.root_dir,
             num_classes=self.num_classes,
@@ -329,4 +340,4 @@ class BenV2Dataset:
             transforms=eval_transform,
         )
 
-        return subset_train, dataset_val, dataset_test
+        return subset_train, subset_val, dataset_test

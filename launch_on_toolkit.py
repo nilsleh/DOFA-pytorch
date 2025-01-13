@@ -13,5 +13,5 @@ def launch_all_scripts_in_directory(directory: str):
 
 if __name__ == "__main__":
     # Example usage:
-    directory_with_scripts = "scripts/flair2_rgb"
+    directory_with_scripts = "scripts/benv2_rgb"
     launch_all_scripts_in_directory(directory_with_scripts)

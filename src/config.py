@@ -68,7 +68,7 @@ class GeoBenchDatasetConfig(BaseDatasetConfig):
 
 ############ CLASSSIFICATION #######################
 
-class Resics_rgb_Config(BaseDatasetConfig):
+class Resisc_rgb_Config(BaseDatasetConfig):
     dataset_type: str = "resisc45"
     task: str = "classification"
     dataset_name: str = "resisc45"
@@ -78,6 +78,7 @@ class Resics_rgb_Config(BaseDatasetConfig):
     band_names: str = ["Red", "Green", "Blue"]
     image_resolution: int = 224
     multilabel: bool = False
+    band_wavelengths: List[float] = [0.66, 0.56, 0.48]
 
 class Benv2_all_Config(BaseDatasetConfig):
     dataset_type: str = "benv2"
@@ -102,6 +103,7 @@ class Benv2_S2_Config(Benv2_all_Config):
 class Benv2_RGB_Config(Benv2_all_Config):
     bands: str = "rgb"
     num_channels: int = 3
+    band_wavelengths: List[float] = [0.66, 0.56, 0.48]
 
 
 class GeoBench_so2sat_10band_Config(GeoBenchDatasetConfig):
@@ -955,7 +957,7 @@ dataset_config_registry = {
     "geobench_SAcrop_13": GeoBench_SAcrop_13_Config,
     "geobench_nzcattle_13": GeoBench_nzcattle_13_Config,
     ####### other datasets ######
-    "resics45_rgb": Resics_rgb_Config,
+    "resisc45_rgb": Resisc_rgb_Config,
     "benv2_s1": Benv2_S1_Config,
     "benv2_s2": Benv2_S2_Config,
     "benv2_rgb": Benv2_RGB_Config,
@@ -1213,6 +1215,7 @@ class AnySat_cls_Config(BaseModelConfig):
     task: str = "classification"
     embed_dim: int = 768
     num_channels: int = 3
+    # pretrained_path: str = "/mnt/data/fm_weights/AnySat.pth"
 
     @validator("num_channels")
     def validate_num_channels(cls, value):
@@ -1382,6 +1385,7 @@ class RCF_cls_Config(BaseModelConfig):
     mode: str = "gaussian"
     num_scales: int = 1
     spatial_dim: int = 1
+    out_features: bool = False
 
 class RCF_seg_Config(BaseModelConfig):
     task: str = "segmentation"
@@ -1391,7 +1395,7 @@ class RCF_seg_Config(BaseModelConfig):
     bias: float = -1.0
     seed: int = 0
     mode: str = "gaussian"
-    num_scales: int = 4
+    num_scales: int = 1
     spatial_dim: int = 32
     
 

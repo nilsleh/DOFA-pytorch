@@ -196,7 +196,7 @@ class RCFClassification(LightningTask):
 
         self.encoder = RCF(**kwargs)
 
-        self.linear_classifier = nn.Linear(config["features"], data_config["num_classes"])
+        self.linear_classifier = nn.Linear(config.features, data_config.num_classes)
 
         self.criterion = (
             nn.MultiLabelSoftMarginLoss()
@@ -205,19 +205,18 @@ class RCFClassification(LightningTask):
         )
     
     def loss(self, outputs, labels):
-        return self.criterion(outputs[0], labels)
+        return self.criterion(outputs, labels)
 
     def forward(self, samples):
         feats = self.encoder.forward(samples)[0]
-        out_logits = self.linear_classifier(feats)
-        return (out_logits, feats) if self.config.out_features else out_logits
+        return self.linear_classifier(feats)
 
     def params_to_optimize(self):
         return self.linear_classifier.parameters()
 
     def log_metrics(self, outputs, targets, prefix="train"):
         # Calculate accuracy and other classification-specific metrics
-        acc1, acc5 = cls_metric(self.data_config, outputs[0], targets)
+        acc1, acc5 = cls_metric(self.data_config, outputs, targets)
         self.log(
             f"{prefix}_loss",
             self.loss(outputs, targets),
@@ -248,10 +247,11 @@ class RCFSegmentation(LightningTask):
 
         self.encoder = RCF(**kwargs)
 
-        self.neck = Feature2Pyramid(embed_dim=kwargs["features"], rescales=[4, 2, 1, 0.5])
+        if config.num_scales == 1:
+            self.neck = Feature2Pyramid(embed_dim=kwargs["features"], rescales=[4, 2, 1, 0.5])
         self.decoder = UPerHead(
-            in_channels=[kwargs["features"]] * kwargs["num_scales"],
-            in_index=list(range(kwargs["num_scales"])),
+            in_channels=[kwargs["features"]] * 4,
+            in_index=[0, 1, 2, 3],
             channels=512,
             dropout_ratio=0.1,
             num_classes=data_config.num_classes,
@@ -285,7 +285,8 @@ class RCFSegmentation(LightningTask):
 
     def forward(self, samples):
         feats = self.encoder.forward(samples)
-        feats = self.neck(feats)
+        if self.neck:
+            feats = self.neck(feats)
         out = self.decoder(feats)
         out = resize(out, size=samples.shape[2:], mode="bilinear", align_corners=False)
         out_a = self.aux_head(feats)
