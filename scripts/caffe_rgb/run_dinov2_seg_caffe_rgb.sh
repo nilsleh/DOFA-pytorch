@@ -19,7 +19,7 @@ num_gpus=$(echo $CUDA_VISIBLE_DEVICES | tr ',' '\n' | wc -l)
 --model ${model} \
 --dataset ${dataset} \
 --task ${task} \
---num_workers 8 \
+--num_workers 4 \
 --epochs ${epochs} \
 --seed 42 \
 --num_gpus 1 \
