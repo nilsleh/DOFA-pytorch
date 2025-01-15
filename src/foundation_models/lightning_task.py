@@ -1,3 +1,5 @@
+"""Base Class."""
+
 from lightning import LightningModule
 import torch
 

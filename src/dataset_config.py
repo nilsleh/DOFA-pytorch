@@ -1,6 +1,5 @@
-from pydantic import BaseModel, Field, validator
-from typing import Optional, Dict, List, Tuple
-import pdb
+from pydantic import BaseModel, validator
+from typing import Optional, List
 
 # Pre-define the band_wavelengths dict
 band_names = [
@@ -99,7 +98,11 @@ class GeoBenchDatasetConfig(BaseDatasetConfig):
 ############ CLASSSIFICATION #######################
 
 
+<<<<<<< HEAD:src/config.py
 class Resisc_rgb_Config(BaseDatasetConfig):
+=======
+class Resics_rgb_Config(BaseDatasetConfig):
+>>>>>>> geofm:src/dataset_config.py
     dataset_type: str = "resisc45"
     task: str = "classification"
     dataset_name: str = "resisc45"
@@ -110,6 +113,7 @@ class Resisc_rgb_Config(BaseDatasetConfig):
     image_resolution: int = 224
     multilabel: bool = False
     band_wavelengths: List[float] = [0.66, 0.56, 0.48]
+
 
 
 class Benv2_all_Config(BaseDatasetConfig):
@@ -1047,6 +1051,7 @@ dataset_config_registry = {
     "benv2_s2": Benv2_S2_Config,
     "benv2_rgb": Benv2_RGB_Config,
     "benv2_all": Benv2_all_Config,
+<<<<<<< HEAD:src/config.py
     "flair2_rgb": Flair2_RGB_Config,
     "loveda_rgb": LoveDA_RGB_Config,
     "caffe_rgb": CAFFE_Config,
@@ -1517,4 +1522,6 @@ model_config_registry = {
     "satmae_seg_rgb": SatMAE_seg_rgb_Config,
     "rcf_cls": RCF_cls_Config,
     "rcf_seg": RCF_seg_Config,
+=======
+>>>>>>> geofm:src/dataset_config.py
 }

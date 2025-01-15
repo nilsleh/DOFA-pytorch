@@ -2,20 +2,23 @@ import argparse
 import datetime
 import os
 from pathlib import Path
-import warnings
-from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
-from pytorch_lightning.loggers import MLFlowLogger, CSVLogger
-import pytorch_lightning as pl
-from pytorch_lightning.strategies import DDPStrategy
-from datasets.data_module import BenchmarkDataModule
 from omegaconf import OmegaConf
+
+import warnings
+from lightning.pytorch.callbacks import ModelCheckpoint, LearningRateMonitor
+from lightning.pytorch.loggers import MLFlowLogger, CSVLogger
+from lightning import Trainer
+from lightning.pytorch.strategies import DDPStrategy
+from datasets.data_module import BenchmarkDataModule
+from lightning.pytorch import seed_everything
+
+from factory import create_model
+from model_config import model_config_registry
+from dataset_config import dataset_config_registry
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore")
-
-from factory import create_model
-from config import model_config_registry, dataset_config_registry
 
 
 def get_args_parser():
@@ -51,11 +54,9 @@ def get_args_parser():
 
 
 def main(args):
-    pl.seed_everything(args.seed)
+    seed_everything(args.seed)
 
-    # Create output directory adding timestamp to output dir
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    args.output_dir = args.output_dir + "_" + timestamp
+    # Create output directory
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
 
     # Setup configs
@@ -63,15 +64,12 @@ def main(args):
     dataset_config = dataset_config_registry.get(args.dataset)()
     model_config = model_config_registry.get(args.model)()
 
-    # Calculate effective batch size and learning rate
-    eff_batch_size = args.batch_size * args.num_gpus
-
     args.lr = args.lr * args.num_gpus
 
     experiment_name = f"{args.model}_{args.dataset}"
     mlf_logger = MLFlowLogger(
         experiment_name=experiment_name,
-        run_name=f"{experiment_name}_run_{timestamp}",
+        run_name=f"{experiment_name}_run_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}",
         tracking_uri=f"file:{os.path.join(args.output_dir, 'mlruns')}",
     )
     loggers = [mlf_logger, CSVLogger(args.output_dir)]
@@ -91,8 +89,8 @@ def main(args):
     ]
 
     # Initialize trainer
-    trainer = pl.Trainer(
-        logger=loggers,
+    trainer = Trainer(
+        logger=mlf_logger,
         callbacks=callbacks,
         strategy=DDPStrategy(find_unused_parameters=False)
         if args.strategy == "ddp"

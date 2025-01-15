@@ -3,9 +3,7 @@ from einops import rearrange
 import math
 import itertools
 import torch
-from collections import OrderedDict
 import warnings
-from loguru import logger
 
 
 class PretrainedCROMA(nn.Module):
@@ -22,25 +20,30 @@ class PretrainedCROMA(nn.Module):
         """
         super().__init__()
         # check types
-        assert type(pretrained_path) == str, (
-            f"pretrained_path must be a string, not {type(pretrained_path)}"
-        )
-        assert type(size) == str, f"size must be a string, not {type(size)}"
-        assert type(modality) == str, f"modality must be a string, not {type(modality)}"
-        assert type(image_resolution) == int, (
-            f"image_resolution must be an int, not {type(image_resolution)}"
-        )
+        assert isinstance(
+            pretrained_path, str
+        ), f"pretrained_path must be a string, not {type(pretrained_path)}"
+        assert isinstance(size, str), f"size must be a string, not {type(size)}"
+        assert isinstance(
+            modality, str
+        ), f"modality must be a string, not {type(modality)}"
+        assert isinstance(
+            image_resolution, int
+        ), f"image_resolution must be an int, not {type(image_resolution)}"
 
         # check values
-        assert size in ["base", "large"], (
-            f"size must be either base or large, not {size}"
-        )
-        assert image_resolution % 8 == 0, (
-            f"image_resolution must be a multiple of 8, not {image_resolution}"
-        )
-        assert modality in ["both", "SAR", "optical"], (
-            f"modality must be either both, SAR, or optical, not {modality}"
-        )
+        assert size in [
+            "base",
+            "large",
+        ], f"size must be either base or large, not {size}"
+        assert (
+            image_resolution % 8 == 0
+        ), f"image_resolution must be a multiple of 8, not {image_resolution}"
+        assert modality in [
+            "both",
+            "SAR",
+            "optical",
+        ], f"modality must be either both, SAR, or optical, not {modality}"
 
         # warn the user if the path contains a different size than the size parameter
         if size == "base" and "large" in pretrained_path:
@@ -73,7 +76,11 @@ class PretrainedCROMA(nn.Module):
         )
 
         if modality in ["SAR", "both"]:
+<<<<<<< HEAD
             print(f"Initializing SAR encoder")
+=======
+            print("Initializing SAR encoder")
+>>>>>>> geofm
             self.s1_encoder = ViT(
                 dim=self.encoder_dim,
                 depth=int(self.encoder_depth / 2),
@@ -95,7 +102,11 @@ class PretrainedCROMA(nn.Module):
             self.GAP_FFN_s1.load_state_dict(torch.load(pretrained_path)["s1_GAP_FFN"])
 
         if modality in ["optical", "both"]:
+<<<<<<< HEAD
             print(f"Initializing optical encoder")
+=======
+            print("Initializing optical encoder")
+>>>>>>> geofm
             self.s2_encoder = ViT(
                 dim=self.encoder_dim,
                 depth=self.encoder_depth,
@@ -117,7 +128,11 @@ class PretrainedCROMA(nn.Module):
             self.GAP_FFN_s2.load_state_dict(torch.load(pretrained_path)["s2_GAP_FFN"])
 
         if modality == "both":
+<<<<<<< HEAD
             print(f"Initializing joint SAR-optical encoder")
+=======
+            print("Initializing joint SAR-optical encoder")
+>>>>>>> geofm
             self.cross_encoder = BaseTransformerCrossAttn(
                 dim=self.encoder_dim,
                 depth=int(self.encoder_depth / 2),
@@ -132,9 +147,15 @@ class PretrainedCROMA(nn.Module):
     def forward(self, SAR_images=None, optical_images=None):
         return_dict = {}
         if self.modality in ["SAR", "both"]:
+<<<<<<< HEAD
             assert SAR_images is not None, (
                 f"Modality is set to {self.modality}, but SAR_images are None"
             )
+=======
+            assert (
+                SAR_images is not None
+            ), f"Modality is set to {self.modality}, but SAR_images are None"
+>>>>>>> geofm
             SAR_encodings = self.s1_encoder(
                 imgs=SAR_images, attn_bias=self.attn_bias.to(SAR_images.device)
             )  # (bsz, num_patches, encoder_dim)
@@ -143,9 +164,15 @@ class PretrainedCROMA(nn.Module):
             return_dict["SAR_GAP"] = SAR_GAP
 
         if self.modality in ["optical", "both"]:
+<<<<<<< HEAD
             assert optical_images is not None, (
                 f"Modality is set to {self.modality}, but optical_images are None"
             )
+=======
+            assert (
+                optical_images is not None
+            ), f"Modality is set to {self.modality}, but optical_images are None"
+>>>>>>> geofm
             optical_encodings, out_feats = self.s2_encoder(
                 imgs=optical_images, attn_bias=self.attn_bias.to(optical_images.device)
             )  # (bsz, num_patches, encoder_dim)
