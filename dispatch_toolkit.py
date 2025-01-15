@@ -59,7 +59,7 @@ TOOLKIT_ENVS = (
 
 # Computational requirements
 TOOLKIT_CPU = 8
-TOOLKIT_GPU = 1
+TOOLKIT_GPU = 4
 TOOLKIT_MEM = 32
 
 

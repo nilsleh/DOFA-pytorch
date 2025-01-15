@@ -201,13 +201,12 @@ class FLAIR(torch.utils.data.Dataset):
 class SegDataAugmentation(torch.nn.Module):
     def __init__(self, split, size):
         """Initialize the data augmentation pipeline for the segmentation task.
-        
+
         Args:
             split (str): The split of the dataset. Either 'train' or 'test'.
             size (int): The size of the image.
         """
         super().__init__()
-
 
         mean = torch.tensor([105.08, 110.87, 101.82])
         std = torch.tensor([52.17, 45.38, 44])
@@ -255,6 +254,10 @@ class Flair2Dataset:
         )
         # split val into val and test
         generator = torch.Generator().manual_seed(0)
-        dataset_train, dataset_val = random_split(dataset_train, [1 - self.val_split_pct, self.val_split_pct], generator=generator)
-        
+        dataset_train, dataset_val = random_split(
+            dataset_train,
+            [1 - self.val_split_pct, self.val_split_pct],
+            generator=generator,
+        )
+
         return dataset_train, dataset_val, dataset_test

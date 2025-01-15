@@ -114,7 +114,9 @@ class BigEarthNetv2(BigEarthNet):
         self.metadata = pd.read_parquet(os.path.join(self.root, filename))
         # replace "validation" with "val" in split column
         self.metadata["split"] = self.metadata["split"].replace("validation", "val")
-        self.metadata = self.metadata[self.metadata["split"] == self.split].reset_index()
+        self.metadata = self.metadata[
+            self.metadata["split"] == self.split
+        ].reset_index()
 
         def construct_folder_path(root, dir, patch_id, remove_last: int = 2):
             tile_id = "_".join(patch_id.split("_")[:-remove_last])

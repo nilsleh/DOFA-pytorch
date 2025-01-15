@@ -122,7 +122,6 @@ experiments = [
         "lr": 0.002,
         "warmup_epochs": 3,
     },
-    
 ]
 
 
@@ -178,6 +177,7 @@ num_gpus=$(echo $CUDA_VISIBLE_DEVICES | tr ',' '\\n' | wc -l)
             f.write(script_content)
 
         os.chmod(script_path, 0o755)
+
 
 if __name__ == "__main__":
     # Generate scripts in the same directory as this file

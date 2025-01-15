@@ -2,6 +2,7 @@ import os
 import glob
 import subprocess
 
+
 def launch_all_scripts_in_directory(directory: str):
     """Finds all .sh files in 'directory' and calls dispatch_toolkit.py to launch each one."""
     sh_files = glob.glob(os.path.join(directory, "*.sh"))
@@ -10,6 +11,7 @@ def launch_all_scripts_in_directory(directory: str):
         cmd = f"python dispatch_toolkit.py --path '{script}'"
         print(f"Launching: {cmd}")
         subprocess.run(cmd, shell=True, check=True)
+
 
 if __name__ == "__main__":
     # Example usage:

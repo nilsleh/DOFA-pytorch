@@ -4,17 +4,17 @@ import torch
 from torchgeo.datasets import LoveDA
 from torch.utils.data import random_split
 
+
 class SegDataAugmentation(torch.nn.Module):
     def __init__(self, split, size):
         """Initialize the data augmentation pipeline for the segmentation task.
-        
+
         Args:
             split (str): The split of the dataset. Either 'train' or 'test'.
             size (int): The size of the image.
             num_channels (int): The desired number of input channels for the model.
         """
         super().__init__()
-
 
         mean = torch.Tensor([0])
         std = torch.Tensor([1])
@@ -57,11 +57,13 @@ class LoveDADataset:
         dataset_train = LoveDA(
             root=self.root_dir, split="train", transforms=train_transform
         )
-        dataset_val = LoveDA(
-            root=self.root_dir, split="val", transforms=eval_transform
-        )
+        dataset_val = LoveDA(root=self.root_dir, split="val", transforms=eval_transform)
         # split val into val and test
         generator = torch.Generator().manual_seed(0)
-        dataset_val, dataset_test = random_split(dataset_val, [1 - self.test_split_pct, self.test_split_pct], generator=generator)
-        
+        dataset_val, dataset_test = random_split(
+            dataset_val,
+            [1 - self.test_split_pct, self.test_split_pct],
+            generator=generator,
+        )
+
         return dataset_train, dataset_val, dataset_test
