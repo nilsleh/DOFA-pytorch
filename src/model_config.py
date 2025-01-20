@@ -40,8 +40,9 @@ class SatMAE_seg_Config(BaseModelConfig):
     patch_size: int = 8
     num_channels: int = 10
     channel_groups: Tuple[Tuple[int, ...], ...] = ((0, 1, 2, 6), (3, 4, 5, 7), (8, 9))
-    pretrained_path: str = "src/fm_weights/checkpoint_ViT-L_pretrain_fmow_sentinel.pth"
-
+    pretrained_path: str = (
+        "/mnt/data/fm_weights/checkpoint_ViT-L_pretrain_fmow_sentinel.pth"
+    )
 
 class SatMAE_seg_rgb_Config(BaseModelConfig):
     model_type: str = "satmae"
@@ -52,7 +53,9 @@ class SatMAE_seg_rgb_Config(BaseModelConfig):
     num_channels: int = 3
     image_resolution: int = 224
     patch_size: int = 16
-    pretrained_path: str = "src/fm_weights/checkpoint_ViT-L_pretrain_fmow_rgb.pth"
+    pretrained_path: str = (
+        "/mnt/data/fm_weights/checkpoint_ViT-L_pretrain_fmow_rgb.pth"
+    )
 
 
 class SatMAE_cls_Config(BaseModelConfig):
@@ -65,8 +68,9 @@ class SatMAE_cls_Config(BaseModelConfig):
     patch_size: int = 8
     num_channels: int = 10
     channel_groups: Tuple[Tuple[int, ...], ...] = ((0, 1, 2, 6), (3, 4, 5, 7), (8, 9))
-    pretrained_path: str = "src/fm_weights/checkpoint_ViT-L_pretrain_fmow_sentinel.pth"
-
+    pretrained_path: str = (
+        "/mnt/data/fm_weights/checkpoint_ViT-L_pretrain_fmow_sentinel.pth"
+    )
 
 class SatMAE_cls_rgb_Config(BaseModelConfig):
     model_type: str = "satmae"
@@ -77,12 +81,14 @@ class SatMAE_cls_rgb_Config(BaseModelConfig):
     num_channels: int = 3
     patch_size: int = 16
     image_resolution: int = 224
-    pretrained_path: str = "src/fm_weights/checkpoint_ViT-L_pretrain_fmow_rgb.pth"
+    pretrained_path: str = (
+        "/mnt/data/fm_weights/checkpoint_ViT-L_pretrain_fmow_rgb.pth"
+    )
 
 
 class Panopticon_seg_Config(BaseModelConfig):
     model_type: str = "panopticon"
-    pretrained_path: str = "src/fm_weights/v2_11-06"
+    pretrained_path: str = "/mnt/data/fm_weights/v2_11-06"
     image_resolution: int = 224
     out_features: bool = True
     task: str = "segmentation"
@@ -94,7 +100,7 @@ class Panopticon_seg_Config(BaseModelConfig):
 
 class Panopticon_cls_Config(BaseModelConfig):
     model_type: str = "panopticon"
-    pretrained_path: str = "src/fm_weights/v2_11-06"
+    pretrained_path: str = "/mnt/data/fm_weights/v2_11-06"
     image_resolution: int = 224
     out_features: bool = True
     task: str = "classification"
@@ -106,7 +112,7 @@ class Panopticon_cls_Config(BaseModelConfig):
 
 class CROMA_cls_Config(BaseModelConfig):
     model_type: str = "croma"
-    pretrained_path: str = "src/fm_weights/CROMA_base.pt"
+    pretrained_path: str = "/mnt/data/fm_weights/CROMA_base.pt"
     size: str = "base"
     modality: str = "optical"
     image_resolution: int = 120
@@ -127,7 +133,7 @@ class CROMA_cls_Config(BaseModelConfig):
 
 class CROMA_seg_Config(BaseModelConfig):
     model_type: str = "croma"
-    pretrained_path: str = "src/fm_weights/CROMA_base.pt"
+    pretrained_path: str = "/mnt/data/fm_weights/CROMA_base.pt"
     size: str = "base"
     modality: str = "optical"
     image_resolution: int = 120
@@ -149,7 +155,7 @@ class CROMA_seg_Config(BaseModelConfig):
 
 class ScaleMAE_seg_Config(BaseModelConfig):
     model_type: str = "scalemae"
-    pretrained_path: str = "src/fm_weights/scalemae-vitlarge-800.pth"
+    pretrained_path: str = "/mnt/data/fm_weights/scalemae-vitlarge-800.pth"
     image_resolution: int = 224
     out_features: bool = True
     freeze_backbone: bool = True
@@ -169,7 +175,7 @@ class ScaleMAE_seg_Config(BaseModelConfig):
 
 class ScaleMAE_cls_Config(BaseModelConfig):
     model_type: str = "scalemae"
-    pretrained_path: str = "src/fm_weights/scalemae-vitlarge-800.pth"
+    pretrained_path: str = "/mnt/data/fm_weights/scalemae-vitlarge-800.pth"
     image_resolution: int = 224
     out_features: bool = True
     freeze_backbone: bool = True
@@ -219,12 +225,7 @@ class Dinov2_cls_Config(BaseModelConfig):
 
     @validator("dino_size")
     def validate_dino_size(cls, value):
-        if value not in [
-            "dinov2_vits14",
-            "dinov2_vitb14",
-            "dinov2_vitl14",
-            "dinov2_vitg14",
-        ]:
+        if value not in ['dinov2_vits14','dinov2_vitb14','dinov2_vitl14','dinov2_vitg14']:
             raise ValueError("Wrong Dinov2 model.")
         return value
 
@@ -247,6 +248,7 @@ class AnySat_cls_Config(BaseModelConfig):
     task: str = "classification"
     embed_dim: int = 768
     num_channels: int = 3
+    # pretrained_path: str = "/mnt/data/fm_weights/AnySat.pth"
 
     @validator("num_channels")
     def validate_num_channels(cls, value):
@@ -262,15 +264,13 @@ class Dinov2_base_cls_Config(Dinov2_cls_Config):
     dino_size: str = "dinov2_vitb14"
     embed_dim: int = 768
 
-
 class Dinov2_base_seg_Config(Dinov2_seg_Config):
     dino_size: str = "dinov2_vitb14"
     embed_dim: int = 768
 
-
 class SoftCON_seg_Config(BaseModelConfig):
     model_type: str = "softcon"
-    pretrained_path: str = "src/fm_weights/B13_vitb14_softcon.pth"
+    pretrained_path: str = "/mnt/data/fm_weights/B13_vitb14_softcon.pth"
     image_resolution: int = 224
     softcon_size: str = "vit_base"
     out_features: bool = True
@@ -291,7 +291,7 @@ class SoftCON_seg_Config(BaseModelConfig):
 
 class SoftCON_cls_Config(BaseModelConfig):
     model_type: str = "softcon"
-    pretrained_path: str = "src/fm_weights/B13_vitb14_softcon.pth"
+    pretrained_path: str = "/mnt/data/fm_weights/B13_vitb14_softcon.pth"
     image_resolution: int = 224
     softcon_size: str = "vit_base"
     out_features: bool = True
@@ -312,7 +312,7 @@ class SoftCON_cls_Config(BaseModelConfig):
 
 class DOFA_seg_Config(BaseModelConfig):
     model_type: str = "dofa"
-    pretrained_path: str = "src/fm_weights/DOFA_ViT_large_e100.pth"
+    pretrained_path: str = "/mnt/data/fm_weights/DOFA_ViT_large_e100.pth"
     image_resolution: int = 224
     out_features: bool = True
     freeze_backbone: bool = True
@@ -332,7 +332,7 @@ class DOFA_seg_Config(BaseModelConfig):
 
 class DOFA_base_seg_Config(BaseModelConfig):
     model_type: str = "dofa"
-    pretrained_path: str = "src/fm_weights/DOFA_ViT_base_e120.pth"
+    pretrained_path: str = "/mnt/data/fm_weights/DOFA_ViT_base_e120.pth"
     image_resolution: int = 224
     out_features: bool = True
     freeze_backbone: bool = True
@@ -349,10 +349,9 @@ class DOFA_base_seg_Config(BaseModelConfig):
     class Config:
         validate_assignment = True
 
-
 class DOFA_cls_Config(BaseModelConfig):
     model_type: str = "dofa"
-    pretrained_path: str = "src/fm_weights/DOFA_ViT_large_e100.pth"
+    pretrained_path: str = "/mnt/data/fm_weights/DOFA_ViT_large_e100.pth"
     image_resolution: int = 224
     out_features: bool = True
     freeze_backbone: bool = True
@@ -372,7 +371,7 @@ class DOFA_cls_Config(BaseModelConfig):
 
 class GFM_seg_Config(BaseModelConfig):
     model_type: str = "gfm"
-    pretrained_path: str = "src/fm_weights/gfm.pth"
+    pretrained_path: str = "/mnt/data/fm_weights/gfm.pth"
     image_resolution: int = 192
     out_features: bool = True
     freeze_backbone: bool = True
@@ -392,7 +391,7 @@ class GFM_seg_Config(BaseModelConfig):
 
 class GFM_cls_Config(BaseModelConfig):
     model_type: str = "gfm"
-    pretrained_path: str = "src/fm_weights/gfm.pth"
+    pretrained_path: str = "/mnt/data/fm_weights/gfm.pth"
     image_resolution: int = 192
     out_features: bool = True
     freeze_backbone: bool = True
@@ -408,6 +407,29 @@ class GFM_cls_Config(BaseModelConfig):
 
     class Config:
         validate_assignment = True
+
+class RCF_cls_Config(BaseModelConfig):
+    task: str = "classification"
+    model_type: str = "rcf"
+    features: int = 256
+    kernel_size: int = 3
+    bias: float = -1.0
+    seed: int = 0
+    mode: str = "gaussian"
+    num_scales: int = 1
+    spatial_dim: int = 1
+    out_features: bool = False
+
+class RCF_seg_Config(BaseModelConfig):
+    task: str = "segmentation"
+    model_type: str = "rcf"
+    features: int = 256
+    kernel_size: int = 3
+    bias: float = -1.0
+    seed: int = 0
+    mode: str = "gaussian"
+    num_scales: int = 1
+    spatial_dim: int = 32
 
 
 model_config_registry = {

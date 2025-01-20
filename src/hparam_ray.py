@@ -27,7 +27,8 @@ from ray.train import RunConfig
 # from ray.tune.integration.pytorch_lightning import TuneReportCheckpointCallback
 
 # Your existing project imports
-from config import model_config_registry, dataset_config_registry
+from dataset_config import dataset_config_registry
+from model_config import model_config_registry
 from datasets.data_module import BenchmarkDataModule
 from factory import create_model
 
@@ -156,8 +157,11 @@ def main():
     # write to file
     best_trial_file = os.path.join(args.output_dir, "best_trial.txt")
     with open(best_trial_file, "w") as f:
+        f.write(f"Best trial metrics: {best_trial.metrics}\n")
         f.write(f"Best trial config: {best_trial.config}\n")
-        f.write(f"Best trial final metric: {best_trial[model_monitor]}\n")
+
+    df = results.get_dataframe()
+    df.to_csv(os.path.join(args.output_dir, "tune_results.csv"))
 
     ray.shutdown()
 

@@ -142,6 +142,13 @@ def generate_bash_scripts(experiments, out_dir="."):
         script_name = f"run_{model}_{dataset}.sh"
         script_path = os.path.join(dataset_dir, script_name)
 
+        lr_min = 0.0001
+        lr_max = 0.003
+
+        batch_choices = [16, 32]
+
+        batch_choices_str = " ".join(str(x) for x in batch_choices)
+
         # Generate script content
         script_content = f"""#!/bin/bash
 echo "Contents of the current directory:"
@@ -154,23 +161,26 @@ model="{model}"
 dataset="{dataset}"
 task="{task}"
 batch_size="{batch_size}"
-lr="{lr}"
+lr_min="{lr_min}"
+lr_max="{lr_max}"
 epochs="{epochs}"
 warmup_epochs="{warmup_epochs}"
+batch_choices="{batch_choices_str}"
 num_gpus=$(echo $CUDA_VISIBLE_DEVICES | tr ',' '\\n' | wc -l)
 
-/home/toolkit/.conda/envs/dofaEnv/bin/python src/main.py \\
+/home/toolkit/.conda/envs/dofaEnv/bin/python src/hparam_ray.py \\
 --output_dir /mnt/results/nils/exps/${{model}}_${{dataset}} \\
 --model ${{model}} \\
 --dataset ${{dataset}} \\
 --task ${{task}} \\
 --num_gpus ${{num_gpus}} \\
 --num_workers 8 \\
---batch_size ${{batch_size}} \\
 --epochs ${{epochs}} \\
---lr ${{lr}} \\
 --warmup_epochs ${{warmup_epochs}} \\
 --seed 42 \\
+--lr_min ${{lr_min}} \\
+--lr_max ${{lr_max}} \\
+--batch_choices ${{batch_choices}} \\
 """
 
         with open(script_path, "w") as f:

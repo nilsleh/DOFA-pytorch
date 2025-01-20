@@ -66,7 +66,7 @@ class LightningTask(LightningModule):
             optimizer = torch.optim.SGD(
                 self.params_to_optimize(),
                 lr=self.args.lr,
-                weight_decay=self.args.weight_decay,
+                # weight_decay=self.args.weight_decay,
             )
         else:
             optimizer = torch.optim.AdamW(self.params_to_optimize(), lr=self.args.lr)

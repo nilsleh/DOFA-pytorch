@@ -76,11 +76,7 @@ class PretrainedCROMA(nn.Module):
         )
 
         if modality in ["SAR", "both"]:
-<<<<<<< HEAD
             print(f"Initializing SAR encoder")
-=======
-            print("Initializing SAR encoder")
->>>>>>> geofm
             self.s1_encoder = ViT(
                 dim=self.encoder_dim,
                 depth=int(self.encoder_depth / 2),
@@ -102,11 +98,7 @@ class PretrainedCROMA(nn.Module):
             self.GAP_FFN_s1.load_state_dict(torch.load(pretrained_path)["s1_GAP_FFN"])
 
         if modality in ["optical", "both"]:
-<<<<<<< HEAD
             print(f"Initializing optical encoder")
-=======
-            print("Initializing optical encoder")
->>>>>>> geofm
             self.s2_encoder = ViT(
                 dim=self.encoder_dim,
                 depth=self.encoder_depth,
@@ -128,11 +120,7 @@ class PretrainedCROMA(nn.Module):
             self.GAP_FFN_s2.load_state_dict(torch.load(pretrained_path)["s2_GAP_FFN"])
 
         if modality == "both":
-<<<<<<< HEAD
             print(f"Initializing joint SAR-optical encoder")
-=======
-            print("Initializing joint SAR-optical encoder")
->>>>>>> geofm
             self.cross_encoder = BaseTransformerCrossAttn(
                 dim=self.encoder_dim,
                 depth=int(self.encoder_depth / 2),
@@ -147,15 +135,9 @@ class PretrainedCROMA(nn.Module):
     def forward(self, SAR_images=None, optical_images=None):
         return_dict = {}
         if self.modality in ["SAR", "both"]:
-<<<<<<< HEAD
-            assert SAR_images is not None, (
-                f"Modality is set to {self.modality}, but SAR_images are None"
-            )
-=======
             assert (
                 SAR_images is not None
             ), f"Modality is set to {self.modality}, but SAR_images are None"
->>>>>>> geofm
             SAR_encodings = self.s1_encoder(
                 imgs=SAR_images, attn_bias=self.attn_bias.to(SAR_images.device)
             )  # (bsz, num_patches, encoder_dim)
@@ -164,15 +146,9 @@ class PretrainedCROMA(nn.Module):
             return_dict["SAR_GAP"] = SAR_GAP
 
         if self.modality in ["optical", "both"]:
-<<<<<<< HEAD
-            assert optical_images is not None, (
-                f"Modality is set to {self.modality}, but optical_images are None"
-            )
-=======
             assert (
                 optical_images is not None
             ), f"Modality is set to {self.modality}, but optical_images are None"
->>>>>>> geofm
             optical_encodings, out_feats = self.s2_encoder(
                 imgs=optical_images, attn_bias=self.attn_bias.to(optical_images.device)
             )  # (bsz, num_patches, encoder_dim)
