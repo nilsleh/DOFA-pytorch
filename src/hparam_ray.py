@@ -98,6 +98,7 @@ def train_with_tune(config: Dict[str, Any], args: argparse.Namespace) -> None:
         plugins=[RayLightningEnvironment()],
         accelerator="auto",
         devices="auto",
+        enable_progress_bar=False
     )
 
     trainer = ray.train.lightning.prepare_trainer(trainer)
@@ -152,6 +153,9 @@ def main():
 
     results = tuner.fit()
 
+    df = results.get_dataframe()
+    df.to_csv(os.path.join(args.output_dir, "tune_results.csv"))
+
     best_trial = results.get_best_result(model_monitor, "max")
 
     # write to file
@@ -159,9 +163,6 @@ def main():
     with open(best_trial_file, "w") as f:
         f.write(f"Best trial metrics: {best_trial.metrics}\n")
         f.write(f"Best trial config: {best_trial.config}\n")
-
-    df = results.get_dataframe()
-    df.to_csv(os.path.join(args.output_dir, "tune_results.csv"))
 
     ray.shutdown()
 
