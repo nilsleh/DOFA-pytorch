@@ -1,4 +1,5 @@
 import torch
+import os
 import torch.nn as nn
 from .DOFA.models_dwv import vit_base_patch16 as vit_base_patch16_cls
 from .DOFA.models_dwv import vit_large_patch16 as vit_large_patch16_cls
@@ -10,23 +11,35 @@ from util.misc import resize
 from .lightning_task import LightningTask
 from timm.models.layers import trunc_normal_
 from util.misc import seg_metric, cls_metric
+from torchvision.datasets.utils import download_url
 
 
 class DofaClassification(LightningTask):
-    def __init__(self, args, config, data_config):
-        super().__init__(args, config, data_config)
+
+    url = "https://huggingface.co/earthflow/dofa/resolve/main/{}"
+
+    def __init__(self, args, model_config, data_config):
+        super().__init__(args, model_config, data_config)
 
         self.encoder = (
-            vit_base_patch16_cls(num_classes=config.num_classes)
-            if config.dofa_size == "dofa_base"
-            else vit_large_patch16_cls(num_classes=config.num_classes)
+            vit_base_patch16_cls(num_classes=data_config.num_classes)
+            if model_config.dofa_size == "dofa_base"
+            else vit_large_patch16_cls(num_classes=data_config.num_classes)
         )
 
+        # look for pretrained weights
+        dir = os.getenv("MODEL_WEIGHTS_DIR")
+        filename = model_config.pretrained_path
+        path = os.path.join(dir, filename)
+        if not os.path.exists(path):
+            # download the weights from HF
+            download_url(self.url.format(filename), dir, filename=filename)
+
         # Load pretrained weights
-        check_point = torch.load(config.pretrained_path)
+        check_point = torch.load(path)
         self.encoder.load_state_dict(check_point, strict=False)
 
-        if config.freeze_backbone:
+        if model_config.freeze_backbone:
             self.freeze(self.encoder)
 
         trunc_normal_(self.encoder.head.weight, std=0.01)
@@ -38,7 +51,7 @@ class DofaClassification(LightningTask):
 
         self.criterion = (
             nn.MultiLabelSoftMarginLoss()
-            if config.multilabel
+            if data_config.multilabel
             else nn.CrossEntropyLoss()
         )
 
@@ -46,8 +59,8 @@ class DofaClassification(LightningTask):
         return self.criterion(outputs[0], labels)
 
     def forward(self, samples):
-        out_logits, feats = self.encoder(samples, self.config.band_wavelengths)
-        return (out_logits, feats) if self.config.out_features else out_logits
+        out_logits, feats = self.encoder(samples, self.data_config.band_wavelengths)
+        return (out_logits, feats) if self.model_config.out_features else out_logits
 
     def params_to_optimize(self):
         return self.encoder.head.parameters()
@@ -67,26 +80,26 @@ class DofaClassification(LightningTask):
 
 
 class DofaSegmentation(LightningTask):
-    def __init__(self, args, config, data_config):
-        super().__init__(args, config, data_config)
+    def __init__(self, args, model_config, data_config):
+        super().__init__(args, model_config, data_config)
         self.encoder = (
             vit_base_patch16_seg(
                 drop_path_rate=0,
             )
-            if config.dofa_size == "dofa_base"
+            if model_config.dofa_size == "dofa_base"
             else vit_large_patch16_seg(
                 drop_path_rate=0,
             )
         )
 
         # Load pretrained weights
-        check_point = torch.load(config.pretrained_path)
+        check_point = torch.load(model_config.pretrained_path)
         self.encoder.load_state_dict(check_point, strict=False)
 
-        if config.freeze_backbone:
+        if model_config.freeze_backbone:
             self.freeze(self.encoder)
 
-        edim = config.embed_dim
+        edim = model_config.embed_dim
         self.neck = Feature2Pyramid(embed_dim=edim, rescales=[4, 2, 1, 0.5])
         self.decoder = UPerHead(
             in_channels=[edim] * 4,
@@ -94,7 +107,7 @@ class DofaSegmentation(LightningTask):
             pool_scales=(1, 2, 3, 6),
             channels=512,
             dropout_ratio=0.1,
-            num_classes=config.num_classes,
+            num_classes=data_config.num_classes,
             norm_cfg=dict(type="SyncBN", requires_grad=True),
             align_corners=False,
             loss_decode=dict(
@@ -108,7 +121,7 @@ class DofaSegmentation(LightningTask):
             num_convs=1,
             concat_input=False,
             dropout_ratio=0.1,
-            num_classes=config.num_classes,
+            num_classes=data_config.num_classes,
             norm_cfg=dict(type="SyncBN", requires_grad=True),
             align_corners=False,
             loss_decode=dict(
@@ -123,7 +136,7 @@ class DofaSegmentation(LightningTask):
         )
 
     def forward(self, samples):
-        feats = self.encoder(samples, self.config.band_wavelengths)
+        feats = self.encoder(samples, self.data_config.band_wavelengths)
         feats = self.neck(feats)
         out = self.decoder(feats)
         out = resize(out, size=samples.shape[2:], mode="bilinear", align_corners=False)
@@ -150,10 +163,10 @@ class DofaSegmentation(LightningTask):
 
 
 # Model factory for different dinov2 tasks
-def DofaModel(args, config, data_config):
+def DofaModel(args, model_config, data_config):
     if args.task == "classification":
-        return DofaClassification(args, config, data_config)
+        return DofaClassification(args, model_config, data_config)
     elif args.task == "segmentation":
-        return DofaSegmentation(args, config, data_config)
+        return DofaSegmentation(args, model_config, data_config)
     else:
         raise NotImplementedError("Task not supported")

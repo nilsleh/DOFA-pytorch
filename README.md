@@ -6,8 +6,9 @@ This repository provides tools for evaluating various foundation models on Earth
 
 ## Setup
 
-To get started, ensure you have the following dependencies installed:
+To get started, you can install the required dependencies from the `pyproject.toml`:
 
+<<<<<<< HEAD
 ```bash
 pip install torch==2.1.2
 pip install torchvision==0.16.2
@@ -32,6 +33,12 @@ pip install wandb
 pip install python-dotenv
 pip install git+https://github.com/microsoft/torchgeo.git
 pip install fastparquet
+=======
+For this navigate to the root directory of this repository and do:
+
+```
+pip install -e .
+>>>>>>> geofm
 ```
 
 ### To use [ViT Adapter](https://arxiv.org/abs/2205.08534)
@@ -42,10 +49,23 @@ sh make.sh
 
 
 ### Model Weights
-Pretrained model weights are available on [Hugging Face](https://huggingface.co/XShadow/GeoFMs). Download the necessary weights for your evaluation tasks.
-The SoftCon weights are available on a different [HF repo](https://huggingface.co/wangyi111/softcon).
-DOFA weights are available in this [HF repo](https://huggingface.co/XShadow/DOFA).
-SATMAE++ weights are available in this [HF repo](https://huggingface.co/mubashir04/checkpoint_ViT-L_pretrain_fmow_sentinel).
+Pretrained model weights are available on [Hugging Face](https://huggingface.co/XShadow/GeoFMs).
+
+You can set this environment variable in your terminal with:
+
+```shell
+export MODEL_WEIGHTS_DIR=/your/custom/path
+```
+
+When using any of the FMs, the init method will check whether it can find the pre-trained checkpoint of the respective FM in the above `MODEL_WEIGHTS_DIR` and download it there if not found. If you do not change the env
+variable, the default will be `./fm_weights`.
+
+Some models depend on [torch hub](https://pytorch.org/docs/stable/hub.html#where-are-my-downloaded-models-saved), which by default will load models to `~.cache/torch/hub`. If you would like to change the directory if this to
+for example have a single place where all weights across the models are stored, you can also change
+
+```shell
+export TORCH_HOME=/your/custom/path
+```
 
 ---
 

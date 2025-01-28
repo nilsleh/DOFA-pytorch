@@ -14,24 +14,56 @@ import torch.nn.functional as F
 from .modules import MSDeformAttn
 from timm.models.layers import trunc_normal_
 from torch.nn.init import normal_
+from peft import LoraConfig, get_peft_model
+
 
 from .modules import SpatialPriorModule, InteractionBlock, deform_inputs
 
 
 class DinoV2Classification(LightningTask):
-    def __init__(self, args, config, data_config):
-        super().__init__(args, config, data_config)
+    def __init__(self, args, model_config, data_config):
+        super().__init__(args, model_config, data_config)
 
-        self.encoder = torch.hub.load("facebookresearch/dinov2", config.dino_size)
-        if config.freeze_backbone:
-            self.freeze(self.encoder)
-        self.linear_classifier = nn.Linear(config.embed_dim, config.num_classes)
+        self.lora = True
+
+        self.encoder = torch.hub.load("facebookresearch/dinov2", model_config.dino_size)
+        
+        if self.lora:
+            self.apply_peft_to_last_layers(self.encoder, rank=8)
+
+        if model_config.freeze_backbone:
+            if self.lora:
+                self.freeze_non_lora_params(self.encoder)
+            else:
+                self.freeze(self.encoder)
+
+        self.linear_classifier = nn.Linear(model_config.embed_dim, data_config.num_classes)
+
         self.criterion = (
             nn.MultiLabelSoftMarginLoss()
-            if config.multilabel
+            if data_config.multilabel
             else nn.CrossEntropyLoss()
         )
 
+    
+    def apply_peft_to_last_layers(self, encoder, rank=8):
+        """
+        Apply LoRA to the last few layers of the encoder using PEFT.
+        """
+        # Configure LoRA
+        peft_config = LoraConfig(
+            r=rank,
+            lora_alpha=32,  # Scaling factor for LoRA
+            target_modules=["q", "k", "v", "out"],  # LoRA target layers
+            lora_dropout=0.1,
+            bias="none",
+            task_type="SEQ_CLS"  # Task type (use appropriate type for your model)
+        )
+
+        # Wrap the encoder with PEFT
+        self.encoder = get_peft_model(encoder, peft_config)
+
+    
     def loss(self, outputs, labels):
         return self.criterion(outputs[0], labels)
 
@@ -43,7 +75,12 @@ class DinoV2Classification(LightningTask):
         return out_logits, global_pooled
 
     def params_to_optimize(self):
-        return self.linear_classifier.parameters()
+        if self.lora:
+            # Include LoRA parameters for optimization
+            lora_params = [p for n, p in self.encoder.named_parameters() if "lora" in n]
+            return list(self.linear_classifier.parameters()) + lora_params
+        else:
+            return list(self.linear_classifier.parameters())
 
     def log_metrics(self, outputs, targets, prefix="train"):
         # Calculate accuracy and other classification-specific metrics
@@ -62,12 +99,12 @@ class DinoV2Classification(LightningTask):
 class DinoV2Adapter(nn.Module):
     def __init__(
         self,
-        config,
+        model_config,
         pretrain_size=224,
         num_heads=12,
         conv_inplane=64,
         n_points=4,
-        deform_num_heads=6,
+        deform_num_heads=8,
         init_values=0.0,
         interaction_indexes=None,
         with_cffn=True,
@@ -81,7 +118,7 @@ class DinoV2Adapter(nn.Module):
         super().__init__()
 
         self.cls_token = None
-        self.encoder = torch.hub.load("facebookresearch/dinov2", config.dino_size)
+        self.encoder = torch.hub.load("facebookresearch/dinov2", model_config.dino_size)
         self.num_block = len(self.encoder.blocks)
         self.pretrain_size = (pretrain_size, pretrain_size)
         self.interaction_indexes = interaction_indexes
@@ -210,22 +247,22 @@ class DinoV2Adapter(nn.Module):
 
 
 class DinoV2AdapterSegmentation(LightningTask):
-    def __init__(self, args, config, data_config):
-        super().__init__(args, config, data_config)
+    def __init__(self, args, model_config, data_config):
+        super().__init__(args, model_config, data_config)
         self.adapter_backbone = DinoV2Adapter(
-            config, interaction_indexes=[[0, 2], [3, 5], [6, 8], [9, 11]]
+            model_config, interaction_indexes=[[0, 2], [3, 5], [6, 8], [9, 11]]
         )
-        if config.freeze_backbone:
+        if model_config.freeze_backbone:
             self.freeze(self.adapter_backbone.encoder)
 
-        edim = config.embed_dim
+        edim = model_config.embed_dim
         self.decoder = UPerHead(
             in_channels=[edim] * 4,
             in_index=[0, 1, 2, 3],
             pool_scales=(1, 2, 3, 6),
             channels=512,
             dropout_ratio=0.1,
-            num_classes=config.num_classes,
+            num_classes=data_config.num_classes,
             norm_cfg=dict(type="SyncBN", requires_grad=True),
             align_corners=False,
             loss_decode=dict(
@@ -239,7 +276,7 @@ class DinoV2AdapterSegmentation(LightningTask):
             num_convs=1,
             concat_input=False,
             dropout_ratio=0.1,
-            num_classes=config.num_classes,
+            num_classes=data_config.num_classes,
             norm_cfg=dict(type="SyncBN", requires_grad=True),
             align_corners=False,
             loss_decode=dict(
@@ -283,13 +320,13 @@ class DinoV2AdapterSegmentation(LightningTask):
 
 
 class DinoV2Segmentation(LightningTask):
-    def __init__(self, args, config, data_config):
-        super().__init__(args, config, data_config)
-        self.encoder = torch.hub.load("facebookresearch/dinov2", config.dino_size)
-        if config.freeze_backbone:
+    def __init__(self, args, model_config, data_config):
+        super().__init__(args, model_config, data_config)
+        self.encoder = torch.hub.load("facebookresearch/dinov2", model_config.dino_size)
+        if model_config.freeze_backbone:
             self.freeze(self.encoder)
 
-        edim = config.embed_dim
+        edim = model_config.embed_dim
         self.neck = Feature2Pyramid(embed_dim=edim, rescales=[4, 2, 1, 0.5])
         self.decoder = UPerHead(
             in_channels=[edim] * 4,
@@ -297,7 +334,7 @@ class DinoV2Segmentation(LightningTask):
             pool_scales=(1, 2, 3, 6),
             channels=512,
             dropout_ratio=0.1,
-            num_classes=config.num_classes,
+            num_classes=data_config.num_classes,
             norm_cfg=dict(type="SyncBN", requires_grad=True),
             align_corners=False,
             loss_decode=dict(
@@ -311,7 +348,7 @@ class DinoV2Segmentation(LightningTask):
             num_convs=1,
             concat_input=False,
             dropout_ratio=0.1,
-            num_classes=config.num_classes,
+            num_classes=data_config.num_classes,
             norm_cfg=dict(type="SyncBN", requires_grad=True),
             align_corners=False,
             loss_decode=dict(
@@ -359,10 +396,10 @@ class DinoV2Segmentation(LightningTask):
 
 
 # Model factory for different dinov2 tasks
-def DinoV2Model(args, config, data_config):
+def DinoV2Model(args, model_config, data_config):
     if args.task == "classification":
-        return DinoV2Classification(args, config, data_config)
+        return DinoV2Classification(args, model_config, data_config)
     elif args.task == "segmentation":
-        return DinoV2AdapterSegmentation(args, config, data_config)
+        return DinoV2AdapterSegmentation(args, model_config, data_config)
     else:
         raise NotImplementedError("Task not supported")

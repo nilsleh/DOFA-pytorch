@@ -14,11 +14,11 @@ from foundation_models import (
 from datasets.geobench_wrapper import GeoBenchDataset
 from datasets.resisc_wrapper import Resics45Dataset
 from datasets.benv2_wrapper import BenV2Dataset
+<<<<<<< HEAD
 from datasets.caffe_wrapper import CaffeDataset
 from datasets.flair2_wrapper import Flair2Dataset
+>>>>>>> geofm
 
-model_registry = {
-    "croma": CromaModel,
     # "panopticon": PanopticonModel,
     "scalemae": ScaleMAEModel,
     "gfm": GFMModel,
@@ -30,10 +30,7 @@ model_registry = {
     "rcf": RCFModel
     # Add other model mappings here
 }
-
 dataset_registry = {
-    "geobench": GeoBenchDataset,
-    "resisc45": Resics45Dataset,
     "benv2": BenV2Dataset,
     "caffe": CaffeDataset,
     "flair2": Flair2Dataset
@@ -56,9 +53,6 @@ def create_model(args, config_model, dataset_config=None):
     model_class = model_registry.get(model_name)
     if model_class is None:
         raise ValueError(f"Model type '{model_name}' not found.")
-
-    if dataset_config is not None:
-        config_model.apply_dataset(dataset_config)
 
     model = model_class(args, config_model, dataset_config)
 

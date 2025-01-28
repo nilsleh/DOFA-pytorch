@@ -5,9 +5,14 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "GeoFM"
 version = "0.1.0"
-description = "Project with specific dependencies"
+description = "Accessible Geospatial Foundation Models with PyTorch Lightning."
 authors = [
     { name = "Zhitong Xiong", email = "xiongzhitong@gmail.com" }
+]
+
+maintainers = [
+    { name = "Zhitong Xiong", email = "xiongzhitong@gmail.com" },
+    { name = "Nils Lehmann", email = "n.lehmann@tum.de" }
 ]
 
 
@@ -16,6 +21,8 @@ dependencies = [
     "torchvision==0.16.2",
     "numpy==1.26.4",
     "openmim",
+    "mmsegmentation==1.2.2",
+    "mmcv==2.1.0",
     "tensorboard",
     "loguru",
     "timm",
@@ -31,9 +38,10 @@ dependencies = [
     "omegaconf",
     "wandb",
     "python-dotenv",
-    "torchgeo",
+    "torchgeo @ git+https://github.com/microsoft/torchgeo.git",
     "fastparquet",
     "mlflow",
     "ray>=2.40.0",
+    "huggingface-hub>=0.27.1"
 ]
 

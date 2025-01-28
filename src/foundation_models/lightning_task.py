@@ -5,9 +5,9 @@ import torch
 
 
 class LightningTask(LightningModule):
-    def __init__(self, args, config, data_config):
+    def __init__(self, args, model_config, data_config):
         super().__init__()
-        self.config = config  # model_config
+        self.model_config = model_config  # model_config
         self.args = args  # args for optimization params
         self.data_config = data_config  # dataset_config
         self.save_hyperparameters()
@@ -24,6 +24,14 @@ class LightningTask(LightningModule):
     def unfreeze(self, module):
         for param in module.parameters():
             param.requires_grad = True
+    
+    def freeze_non_lora_params(self, module):
+        """
+        Freeze the encoder parameters except for LoRA-specific ones.
+        """
+        for name, param in module.named_parameters():
+            if "lora" not in name:  # Skip LoRA parameters
+                param.requires_grad = False
 
     def log_metrics(self, outputs, targets, prefix="train"):
         """Abstract method for logging task-specific metrics."""
@@ -62,7 +70,7 @@ class LightningTask(LightningModule):
         return loss
 
     def configure_optimizers(self):
-        if self.config.task == "classification":
+        if self.model_config.task == "classification":
             optimizer = torch.optim.SGD(
                 self.params_to_optimize(),
                 lr=self.args.lr,
