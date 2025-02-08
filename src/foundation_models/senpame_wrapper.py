@@ -59,7 +59,7 @@ class SenPaMAEClassification(LightningTask):
         trunc_normal_(self.linear_classifier.weight, std=0.01)
 
         self.encoder.head = nn.Sequential(
-            # nn.BatchNorm1d(model_config.embed_dim, affine=False, eps=1e-6),
+            nn.BatchNorm1d(model_config.embed_dim, affine=False, eps=1e-6),
             self.linear_classifier,
         )
         
