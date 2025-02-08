@@ -26,6 +26,9 @@ sh make.sh
 ### Model Weights
 Pretrained model weights are available on [Hugging Face](https://huggingface.co/XShadow/GeoFMs).
 
+#### Model Spefic Instructons
+- SenPa-MAE: The cloud storage link for the weights is [here](https://drive.google.com/file/d/16IoG47yzdyUnPqUgaV8ofeja5RgQjlAz/view?usp=drive_link). Download the weights and place them in the `MODEL_WEIGHTS_DIR` directory.
+You can use `gdown <UID>` to download the weights from the google drive link (the UID is the stuff between '/d/' and '/view?usp=drive_link')
 
 ### Set Up Your Environment Variables
 
