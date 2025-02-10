@@ -2,11 +2,11 @@ name: tests
 on:
   push:
     branches:
-      - main
+      - geofm
       - release**
   pull_request:
     branches:
-      - main
+      - geofm
       - release**
 defaults:
   run:
