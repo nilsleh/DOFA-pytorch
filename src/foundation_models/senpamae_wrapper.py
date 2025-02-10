@@ -3,10 +3,10 @@ import os
 import torch.nn as nn
 from mmseg.models.necks import Feature2Pyramid
 from mmseg.models.decode_heads import UPerHead, FCNHead
-from util.misc import resize
+
 from .lightning_task import LightningTask
 from timm.models.layers import trunc_normal_
-from util.misc import seg_metric, cls_metric
+from ..util.misc import resize, seg_metric, cls_metric
 from torchvision.datasets.utils import download_url
 from peft import LoraConfig, get_peft_model
 from .SenPaMAE.model import vit_base_patch16
@@ -15,7 +15,9 @@ import numpy as np
 
 
 class SenPaMAEClassification(LightningTask):
-    url = "TBD" #waiting on weights
+    url = "https://drive.google.com/file/d/16IoG47yzdyUnPqUgaV8ofeja5RgQjlAz" 
+
+    # url = 'https://drive.usercontent.google.com/download?id=16IoG47yzdyUnPqUgaV8ofeja5RgQjlAz&export=download&authuser=0&confirm=t&uuid=9e279667-af3a-4f3a-a648-bec3452a1450&at=AIrpjvMEDRsz82ufHQy8sUmSk5j5%3A1739180929862'
 
     def __init__(self, 
                  args, 
@@ -39,10 +41,10 @@ class SenPaMAEClassification(LightningTask):
         # look for pretrained weights
         dir = os.getenv("MODEL_WEIGHTS_DIR")
         filename = model_config.pretrained_path
+        
         path = os.path.join(dir, filename)
         if not os.path.exists(path):
-            # download the weights from HF
-            # download_url(self.url.format(filename), dir, filename=filename)
+            download_url(self.url, dir, filename=filename)
             raise ValueError(f"Pretrained weights not found at {path}")
         # Load pretrained weights
         check_point = torch.load(path)

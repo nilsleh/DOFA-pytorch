@@ -79,16 +79,24 @@ class LightningTask(LightningModule):
         else:
             optimizer = torch.optim.AdamW(self.params_to_optimize(), lr=self.args.lr)
 
-        num_warmup_steps = (
-            len(self.trainer.datamodule.train_dataloader())
-            * self.args.warmup_epochs
-            // self.args.num_gpus
-        )
-        total_steps = (
-            len(self.trainer.datamodule.train_dataloader())
-            * self.args.epochs
-            // self.args.num_gpus
-        )
+        if self.args.num_gpus >= 1:
+            num_warmup_steps = (
+                len(self.trainer.datamodule.train_dataloader())
+                * self.args.warmup_epochs
+                // self.args.num_gpus
+            )
+            total_steps = (
+                len(self.trainer.datamodule.train_dataloader())
+                * self.args.epochs
+                // self.args.num_gpus
+            )
+        else:
+            num_warmup_steps = (
+                len(self.trainer.datamodule.train_dataloader())
+                * self.args.warmup_epochs
+            )
+            total_steps = len(self.trainer.datamodule.train_dataloader()) * self.args.epochs
+
         scheduler = torch.optim.lr_scheduler.OneCycleLR(
             optimizer,
             max_lr=self.args.lr,

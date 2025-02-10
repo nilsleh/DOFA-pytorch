@@ -1,6 +1,6 @@
 from lightning import LightningDataModule
 import torch
-from factory import create_dataset
+from ..factory import create_dataset
 
 
 class BenchmarkDataModule(LightningDataModule):

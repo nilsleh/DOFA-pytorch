@@ -8,7 +8,7 @@ from torchvision.datasets.utils import download_url
 # use mmsegmentation for upernet+mae
 from mmseg.models.necks import Feature2Pyramid
 from mmseg.models.decode_heads import UPerHead, FCNHead
-from util.misc import resize, seg_metric, cls_metric
+from ..util.misc import resize, seg_metric, cls_metric
 
 
 class CromaClassification(LightningTask):
@@ -27,7 +27,7 @@ class CromaClassification(LightningTask):
             download_url(self.url.format(filename), dir, filename=filename)
 
         self.encoder = PretrainedCROMA(
-            pretrained_path=model_config.pretrained_path,
+            pretrained_path=path,
             size=model_config.size,
             modality=model_config.modality,
             image_resolution=model_config.image_resolution,

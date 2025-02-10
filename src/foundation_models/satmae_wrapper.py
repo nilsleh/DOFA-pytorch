@@ -13,9 +13,8 @@ import os
 # use mmsegmentation for upernet+mae
 from mmseg.models.necks import Feature2Pyramid
 from mmseg.models.decode_heads import UPerHead, FCNHead
-from util.misc import resize
+from ..util.misc import resize, seg_metric, cls_metric
 from .lightning_task import LightningTask
-from util.misc import seg_metric, cls_metric
 
 from torchvision.datasets.utils import download_url
 

@@ -1,6 +1,6 @@
 """Factory utily functions to create datasets and models."""
 
-from foundation_models import (
+from .foundation_models import (
     CromaModel,
     ScaleMAEModel,
     GFMModel,
@@ -11,9 +11,11 @@ from foundation_models import (
     AnySatModel,
     SenPaMAEModel,
 )
-from datasets.geobench_wrapper import GeoBenchDataset
-from datasets.resisc_wrapper import Resics45Dataset
-from datasets.benv2_wrapper import BenV2Dataset
+from .datasets.geobench_wrapper import GeoBenchDataset
+from .datasets.resisc_wrapper import Resics45Dataset
+from .datasets.benv2_wrapper import BenV2Dataset
+
+from .datasets.dummy_dataset import DummyWrapper
 
 model_registry = {
     "croma": CromaModel,
@@ -34,6 +36,7 @@ dataset_registry = {
     "resisc45": Resics45Dataset,
     "benv2": BenV2Dataset,
     # Add other dataset mappings here
+    "dummy": DummyWrapper,
 }
 
 

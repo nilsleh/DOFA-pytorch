@@ -4,11 +4,10 @@ import torch.nn as nn
 
 # use mmsegmentation for upernet+mae
 from mmseg.models.decode_heads import UPerHead, FCNHead
-from util.misc import resize
 
 # assert timm.__version__ == "0.3.2" # version check
 from timm.models.layers import trunc_normal_
-from util.misc import seg_metric, cls_metric
+from ..util.misc import resize, seg_metric, cls_metric
 
 
 class GFMClassification(LightningTask):

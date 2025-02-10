@@ -437,7 +437,6 @@ class ViT(nn.Module):
             j=self.patch_size,
         )
         # x is shape -> (bsz, num_patches, self.channels*self.patch_size*self.patch_size)
-
         x = self.linear_input(x)  # (bsz, num_patches, dim)
         x, out_features = self.transformer(x, relative_position_bias=attn_bias)
         # return out_features

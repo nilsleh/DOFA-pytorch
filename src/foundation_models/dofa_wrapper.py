@@ -7,10 +7,9 @@ from .DOFA.models_dwv_seg import vit_base_patch16 as vit_base_patch16_seg
 from .DOFA.models_dwv_seg import vit_large_patch16 as vit_large_patch16_seg
 from mmseg.models.necks import Feature2Pyramid
 from mmseg.models.decode_heads import UPerHead, FCNHead
-from util.misc import resize
 from .lightning_task import LightningTask
 from timm.models.layers import trunc_normal_
-from util.misc import seg_metric, cls_metric
+from ..util.misc import resize, seg_metric, cls_metric
 from torchvision.datasets.utils import download_url
 from peft import LoraConfig, get_peft_model
 
