@@ -14,7 +14,6 @@ from torchvision.datasets.utils import download_url
 
 
 class ScaleMAEClassification(LightningTask):
-
     url = "https://huggingface.co/torchgeo/{}/resolve/main/{}"
 
     def __init__(self, args, model_config, data_config):
@@ -37,7 +36,11 @@ class ScaleMAEClassification(LightningTask):
         path = os.path.join(dir, filename)
         if not os.path.exists(path):
             # download the weights from HF
-            download_url(self.url.format(filename.split(".")[0], filename), dir, filename=filename)
+            download_url(
+                self.url.format(filename.split(".")[0], filename),
+                dir,
+                filename=filename,
+            )
 
         self.linear_classifier = torch.nn.Linear(
             model_config.embed_dim, data_config.num_classes

@@ -20,8 +20,8 @@ from torchvision.datasets.utils import download_url
 
 
 class SatMAEClassification(LightningTask):
-
     url = "https://huggingface.co/mubashir04/{}/resolve/main/{}"
+
     def __init__(self, args, model_config, data_config):
         super().__init__(args, model_config, data_config)
 
@@ -42,7 +42,11 @@ class SatMAEClassification(LightningTask):
         path = os.path.join(dir, filename)
         if not os.path.exists(path):
             # download the weights from HF
-            download_url(self.url.format(filename.split(".")[0], filename), dir, filename=filename)
+            download_url(
+                self.url.format(filename.split(".")[0], filename),
+                dir,
+                filename=filename,
+            )
 
         # Load pretrained weights
         checkpoint = torch.load(path, map_location="cpu")

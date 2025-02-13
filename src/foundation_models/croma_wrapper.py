@@ -12,19 +12,23 @@ from ..util.misc import resize, seg_metric, cls_metric
 
 
 class CromaClassification(LightningTask):
-
-    url = 'https://huggingface.co/antofuller/CROMA/resolve/main/{}'
+    url = "https://huggingface.co/antofuller/CROMA/resolve/main/{}"
 
     def __init__(self, args, model_config, data_config):
         super().__init__(args, model_config, data_config)
 
         # look for pretrained weights
-        dir = os.getenv("MODEL_WEIGHTS_DIR")
-        filename = model_config.pretrained_path
-        path = os.path.join(dir, filename)
-        if not os.path.exists(path):
-            # download the weights from HF
-            download_url(self.url.format(filename), dir, filename=filename)
+        if model_config.get("pretrained_path", None):
+            path = model_config.pretrained_path
+            if not os.path.exists(path):
+                # download the weights from HF
+                download_url(
+                    self.url.format(os.path.basename(path)),
+                    os.path.dirname(path),
+                    filename=os.path.basename(path),
+                )
+        else:
+            path = None
 
         self.encoder = PretrainedCROMA(
             pretrained_path=path,
@@ -37,11 +41,11 @@ class CromaClassification(LightningTask):
         if model_config.freeze_backbone:
             self.freeze(self.encoder)
 
-        self.encoder.GAP_FFN_s2[1] = torch.nn.Linear(
-            self.encoder.GAP_FFN_s2[1].in_features, data_config.num_classes
+        self.encoder.s2_GAP_FFN[1] = torch.nn.Linear(
+            self.encoder.s2_GAP_FFN[1].in_features, data_config.num_classes
         )
-        self.unfreeze(self.encoder.GAP_FFN_s2[1])
-        del self.encoder.GAP_FFN_s2[2:]
+        self.unfreeze(self.encoder.s2_GAP_FFN[1])
+        del self.encoder.s2_GAP_FFN[2:]
 
         self.criterion = (
             nn.MultiLabelSoftMarginLoss()
@@ -59,7 +63,7 @@ class CromaClassification(LightningTask):
         return (out_logits, feats) if self.model_config.out_features else out_logits
 
     def params_to_optimize(self):
-        return self.encoder.GAP_FFN_s2[1].parameters()
+        return self.encoder.s2_GAP_FFN[1].parameters()
 
     def log_metrics(self, outputs, targets, prefix="train"):
         # Calculate accuracy and other classification-specific metrics

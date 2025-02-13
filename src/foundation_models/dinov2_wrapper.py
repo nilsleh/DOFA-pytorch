@@ -10,6 +10,7 @@ from .lightning_task import LightningTask
 from einops import rearrange
 from ..util.misc import resize, seg_metric, cls_metric
 import torch.nn.functional as F
+
 # from .modules import MSDeformAttn
 from timm.models.layers import trunc_normal_
 from torch.nn.init import normal_
@@ -28,18 +29,18 @@ class DinoV2Classification(LightningTask):
         self.full_finetune = model_config.get("full_finetune", False)
 
         # can only be one of the two
-        assert not (self.lora and self.full_finetune), "Can only use one of LoRA or full finetune bot not both to true"
+        assert not (self.lora and self.full_finetune), (
+            "Can only use one of LoRA or full finetune bot not both to true"
+        )
 
-        if model_config.size == "base":
-            self.encoder = torch.hub.load("facebookresearch/dinov2", "dinov2_vitb14")
-        elif model_config.size == "large":
-            self.encoder = torch.hub.load("facebookresearch/dinov2", "dinov2_vitl14")
-        
-        print(f'DinoV2 model: {model_config.size} | {self.encoder.embed_dim}')
+        self.encoder = torch.hub.load("facebookresearch/dinov2", model_config.dino_size)
+
+        print(f"DinoV2 model: {model_config.size} | {self.encoder.embed_dim}")
         print(self.encoder)
         if self.lora:
-            self.apply_peft_to_last_layers(self.encoder, target_modules=model_config.lora_target_modules, rank=8)
-
+            self.apply_peft_to_last_layers(
+                self.encoder, target_modules=model_config.lora_target_modules, rank=8
+            )
 
         if model_config.freeze_backbone:
             if self.lora:
@@ -47,7 +48,9 @@ class DinoV2Classification(LightningTask):
             else:
                 self.freeze(self.encoder)
 
-        self.linear_classifier = nn.Linear(self.encoder.embed_dim, data_config.num_classes)
+        self.linear_classifier = nn.Linear(
+            self.encoder.embed_dim, data_config.num_classes
+        )
 
         self.criterion = (
             nn.MultiLabelSoftMarginLoss()
@@ -55,8 +58,9 @@ class DinoV2Classification(LightningTask):
             else nn.CrossEntropyLoss()
         )
 
-    
-    def apply_peft_to_last_layers(self, encoder, target_modules: list[str], rank: int=8):
+    def apply_peft_to_last_layers(
+        self, encoder, target_modules: list[str], rank: int = 8
+    ):
         """
         Apply LoRA to the last few layers of the encoder using PEFT.
         """
@@ -67,13 +71,12 @@ class DinoV2Classification(LightningTask):
             target_modules=target_modules,  # LoRA target layers
             lora_dropout=0.1,
             bias="none",
-            task_type="SEQ_CLS"  # Task type (use appropriate type for your model)
+            task_type="SEQ_CLS",  # Task type (use appropriate type for your model)
         )
 
         # Wrap the encoder with PEFT
         self.encoder = get_peft_model(encoder, peft_config)
 
-    
     def loss(self, outputs, labels):
         return self.criterion(outputs[0], labels)
 
@@ -90,7 +93,9 @@ class DinoV2Classification(LightningTask):
             lora_params = [p for n, p in self.encoder.named_parameters() if "lora" in n]
             return list(self.linear_classifier.parameters()) + lora_params
         if self.full_finetune:
-            return list(self.encoder.parameters()) + list(self.linear_classifier.parameters())
+            return list(self.encoder.parameters()) + list(
+                self.linear_classifier.parameters()
+            )
         else:
             return list(self.linear_classifier.parameters())
 

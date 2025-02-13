@@ -24,7 +24,7 @@ class LightningTask(LightningModule):
     def unfreeze(self, module):
         for param in module.parameters():
             param.requires_grad = True
-    
+
     def freeze_non_lora_params(self, module):
         """
         Freeze the encoder parameters except for LoRA-specific ones.
@@ -95,7 +95,9 @@ class LightningTask(LightningModule):
                 len(self.trainer.datamodule.train_dataloader())
                 * self.args.warmup_epochs
             )
-            total_steps = len(self.trainer.datamodule.train_dataloader()) * self.args.epochs
+            total_steps = (
+                len(self.trainer.datamodule.train_dataloader()) * self.args.epochs
+            )
 
         scheduler = torch.optim.lr_scheduler.OneCycleLR(
             optimizer,

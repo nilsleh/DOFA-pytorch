@@ -13,7 +13,6 @@ from torchvision.datasets.utils import download_url
 
 
 class SoftConClassification(LightningTask):
-
     url = "https://huggingface.co/wangyi111/softcon/resolve/main/{}"
 
     def __init__(self, args, model_config, data_config):

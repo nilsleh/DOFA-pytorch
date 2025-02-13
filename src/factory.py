@@ -11,6 +11,7 @@ from .foundation_models import (
     AnySatModel,
     SenPaMAEModel,
 )
+import hydra
 from .datasets.geobench_wrapper import GeoBenchDataset
 from .datasets.resisc_wrapper import Resics45Dataset
 from .datasets.benv2_wrapper import BenV2Dataset
@@ -27,7 +28,7 @@ model_registry = {
     "dofa": DofaModel,
     "satmae": SatMAEModel,
     "anysat": AnySatModel,
-    "senpamae": SenPaMAEModel,  
+    "senpamae": SenPaMAEModel,
     # Add other model mappings here
 }
 

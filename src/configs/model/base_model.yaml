@@ -1,5 +1,5 @@
 model_type: null
-size: ${oc.env:MODEL_SIZE}
+size: base
 num_classes: 10
 task: classification
 band_wavelengths: null
