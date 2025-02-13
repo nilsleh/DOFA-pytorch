@@ -39,16 +39,17 @@ class SenPaMAEClassification(LightningTask):
         print(self.encoder)
 
         # look for pretrained weights
-        dir = os.getenv("MODEL_WEIGHTS_DIR")
-        filename = model_config.pretrained_path
-
-        path = os.path.join(dir, filename)
-        if not os.path.exists(path):
-            download_url(self.url, dir, filename=filename)
-            raise ValueError(f"Pretrained weights not found at {path}")
-        # Load pretrained weights
-        check_point = torch.load(path)
-        self.encoder.load_state_dict(check_point, strict=False)
+        if model_config.get("pretrained_path", None):
+            path = model_config.pretrained_path
+            if not os.path.exists(path):
+                download_url(
+                    self.url.format(os.path.basename(path)),
+                    os.path.dirname(path),
+                    filename=os.path.basename(path),
+                )
+            # Load pretrained weights
+            check_point = torch.load(path)
+            self.encoder.load_state_dict(check_point, strict=False)
 
         # LoRA
         if self.lora and model_config.lora:
@@ -88,6 +89,7 @@ class SenPaMAEClassification(LightningTask):
         # SRF loading
         current_dir = os.path.dirname(os.path.abspath(__file__))
         parent_dir = os.path.dirname(current_dir)  # Go up one level
+
         srf_path = os.path.join(
             parent_dir,
             "foundation_models/SenPaMAE/responsefunctions",

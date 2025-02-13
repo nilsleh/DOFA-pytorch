@@ -12,7 +12,7 @@ from lightning import Trainer
 from pytest import MonkeyPatch
 from hydra import compose, initialize
 
-classification_configs = ["gfm_cls.yaml"]
+classification_configs = ["scalemae_cls.yaml"]
 
 
 @pytest.fixture(autouse=True)

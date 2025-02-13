@@ -8,3 +8,4 @@ image_resolution: 224
 additional_params: {}
 num_channels: 12
 multilabel: false
+out_features: True

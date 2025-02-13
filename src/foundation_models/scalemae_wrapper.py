@@ -24,23 +24,21 @@ class ScaleMAEClassification(LightningTask):
         )
 
         # Load pretrained weights
-        checkpoint = torch.load(path, map_location="cpu")
-        checkpoint_model = checkpoint["model"]
-        msg = self.encoder.load_state_dict(checkpoint_model, strict=False)
+        if model_config.get("pretrained_path", None):
+            path = model_config.pretrained_path
+            if not os.path.exists(path):
+                download_url(
+                    self.url.format(os.path.basename(path)),
+                    os.path.dirname(path),
+                    filename=os.path.basename(path),
+                )
+            checkpoint = torch.load(model_config.pretrained_path, map_location="cpu")
+            checkpoint_model = checkpoint["model"]
+            msg = self.encoder.load_state_dict(checkpoint_model, strict=False)
         # logger.debug(msg)
 
         if model_config.freeze_backbone:
             self.freeze(self.encoder)  # look for pretrained weights
-        dir = os.getenv("MODEL_WEIGHTS_DIR")
-        filename = model_config.pretrained_path
-        path = os.path.join(dir, filename)
-        if not os.path.exists(path):
-            # download the weights from HF
-            download_url(
-                self.url.format(filename.split(".")[0], filename),
-                dir,
-                filename=filename,
-            )
 
         self.linear_classifier = torch.nn.Linear(
             model_config.embed_dim, data_config.num_classes

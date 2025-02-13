@@ -12,7 +12,10 @@ from lightning import Trainer
 from pytest import MonkeyPatch
 from hydra import compose, initialize
 
-classification_configs = ["gfm_cls.yaml"]
+classification_configs = [
+    "satmae_cls",
+    "satmae_cls_rgb",
+]
 
 
 @pytest.fixture(autouse=True)

@@ -5,6 +5,7 @@ from pathlib import Path
 import torch
 import regex as re
 
+from itertools import product
 from src.factory import create_model, model_registry
 from src.datasets.data_module import BenchmarkDataModule
 from omegaconf import OmegaConf
@@ -12,7 +13,9 @@ from lightning import Trainer
 from pytest import MonkeyPatch
 from hydra import compose, initialize
 
-classification_configs = ["gfm_cls.yaml"]
+classification_configs = [
+    "senpamae_cls",
+]
 
 
 @pytest.fixture(autouse=True)
@@ -74,8 +77,13 @@ class TestClassificationModels:
 
         return model_config.model
 
-    @pytest.fixture()
-    def data_config(self, model_config):
+    @pytest.fixture(
+        params=[
+            os.path.join("src", "configs", "dataset", "s2_l1c.yaml"),
+            os.path.join("src", "configs", "dataset", "s2_l2a.yaml"),
+        ]
+    )
+    def data_config(self, model_config, request):
         data_config_path = os.path.join(
             "tests", "configs", "classification_dataset_config.yaml"
         )
@@ -87,11 +95,13 @@ class TestClassificationModels:
         if "num_channels" in model_config:
             data_config.num_channels = model_config.num_channels
 
+        extra_config = OmegaConf.load(request.param)
+
+        data_config = OmegaConf.merge(data_config, extra_config)
+
         return data_config
 
-    @pytest.fixture(
-        params=classification_configs,
-    )
+    @pytest.fixture
     def model(
         self,
         model_config,
