@@ -1,6 +1,7 @@
-import torch
-import torch.nn as nn
+"""Base classes."""
 
+import torch.nn as nn
+from torch import Tensor
 
 
 class LinearHead(nn.Module):
@@ -17,13 +18,13 @@ class LinearHead(nn.Module):
             nn.BatchNorm1d(in_features, affine=False, eps=1e-6),
             nn.Linear(in_features, num_classes),
         )
-    
+
     def forward(self, x: Tensor) -> Tensor:
         """Forward pass of linear head.
-        
+
         Args:
             x: Input tensor of shape (batch_size, in_features).
-        
+
         Returns:
             Tensor: Output tensor of shape (batch_size, num_classes)
         """

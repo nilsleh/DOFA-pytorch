@@ -27,7 +27,7 @@ model_registry = {
     "dofa": DofaModel,
     "satmae": SatMAEModel,
     "anysat": AnySatModel,
-    "senpamae": SenPaMAEModel,  
+    "senpamae": SenPaMAEModel,
     # Add other model mappings here
 }
 

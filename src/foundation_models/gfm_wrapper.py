@@ -9,7 +9,7 @@ from mmseg.models.decode_heads import UPerHead, FCNHead
 from timm.models.layers import trunc_normal_
 from ..util.misc import resize, seg_metric, cls_metric
 
-from src.foundation_models import LinearHead
+from .base import LinearHead
 
 
 class GFMClassification(LightningTask):

@@ -82,7 +82,6 @@ def main(cfg: DictConfig):
             num_sanity_val_steps=0,
         )
 
-
     # Initialize data module
     cfg.dataset.image_resolution = cfg.model.image_resolution
     data_module = BenchmarkDataModule(

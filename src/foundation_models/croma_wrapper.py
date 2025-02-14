@@ -10,7 +10,7 @@ from mmseg.models.necks import Feature2Pyramid
 from mmseg.models.decode_heads import UPerHead, FCNHead
 from ..util.misc import resize, seg_metric, cls_metric
 
-from src.foundation_models import LinearHead
+from .base import LinearHead
 
 
 class CromaClassification(LightningTask):

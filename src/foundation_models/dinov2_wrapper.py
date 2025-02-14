@@ -16,7 +16,7 @@ from timm.models.layers import trunc_normal_
 from torch.nn.init import normal_
 from peft import LoraConfig, get_peft_model
 
-from src.foundation_models import LinearHead
+from .base import LinearHead
 
 
 # from .modules import SpatialPriorModule, InteractionBlock, deform_inputs

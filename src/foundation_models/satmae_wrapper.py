@@ -18,7 +18,7 @@ from .lightning_task import LightningTask
 
 from torchvision.datasets.utils import download_url
 
-from src.foundation_models import LinearHead
+from .base import LinearHead
 
 
 class SatMAEClassification(LightningTask):

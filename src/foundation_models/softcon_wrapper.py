@@ -10,7 +10,7 @@ from einops import rearrange
 from ..util.misc import resize, seg_metric, cls_metric
 from torchvision.datasets.utils import download_url
 
-from src.foundation_models import LinearHead
+from .base import LinearHead
 
 
 class SoftConClassification(LightningTask):

@@ -12,7 +12,7 @@ from ..util.misc import resize, seg_metric, cls_metric
 from .lightning_task import LightningTask
 from torchvision.datasets.utils import download_url
 
-from src.foundation_models import LinearHead
+from .base import LinearHead
 
 
 class ScaleMAEClassification(LightningTask):
