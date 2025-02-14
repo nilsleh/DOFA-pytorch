@@ -124,6 +124,9 @@ class TestClassificationModels:
                 if key.startswith(group):
                     new_dict[group][key.replace(f"{group}.", "")] = val
 
+        # TODO add those additional weights
+        # to remove with pytest.raises call
+
         torch.save(new_dict, str(mocked_path))
 
         data_config.num_classes = orig_classes

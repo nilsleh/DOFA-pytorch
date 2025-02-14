@@ -14,36 +14,6 @@ from hydra import compose, initialize
 classification_configs = ["dofa_cls_linear_probe.yaml", "dofa_cls.yaml"]
 
 
-@pytest.fixture(autouse=True)
-def setup_test_env():
-    """Setup test environment variables.
-
-    Auto-used fixture that sets up required environment variables
-    and cleans them up after tests.
-    """
-    # Store original env vars
-    old_vars = {}
-    for var in ["MODEL_WEIGHTS_DIR", "DATA_DIR"]:
-        old_vars[var] = os.environ.get(var)
-
-    # Set test env vars
-    os.environ["MODEL_WEIGHTS_DIR"] = str(Path(__file__).parent / "test_weights")
-    os.environ["DATA_DIR"] = str(Path(__file__).parent / "test_data")
-
-    # Create test directories
-    Path(os.environ["MODEL_WEIGHTS_DIR"]).mkdir(parents=True, exist_ok=True)
-    Path(os.environ["DATA_DIR"]).mkdir(parents=True, exist_ok=True)
-
-    yield
-
-    # Restore original env vars
-    for var, value in old_vars.items():
-        if value is None:
-            del os.environ[var]
-        else:
-            os.environ[var] = value
-
-
 class TestClassificationModels:
     @pytest.fixture()
     def other_args(self):
@@ -92,16 +62,15 @@ class TestClassificationModels:
         model_config,
         other_args,
         data_config,
-        monkeypatch: MonkeyPatch,
         tmp_path: Path,
     ):
-        # mock weights
-        # get pretrained file name
-        # return create_model(other_args, model_config, data_config)
         model_name = model_config.model_type
         model_class = model_registry.get(model_name)
         if model_class is None:
             raise ValueError(f"Model type '{model_name}' not found.")
+
+        # set env MODEL_WEIGHTS_DIR to temp path
+        os.environ["MODEL_WEIGHTS_DIR"] = str(tmp_path)
 
         model_file_name = os.path.basename(model_config.pretrained_path)
 

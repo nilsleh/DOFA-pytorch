@@ -28,19 +28,22 @@ class SoftConClassification(LightningTask):
         )
 
         # look for pretrained weights
-        dir = os.getenv("MODEL_WEIGHTS_DIR")
-        filename = model_config.pretrained_path
-        path = os.path.join(dir, filename)
-        if not os.path.exists(path):
-            # download the weights from HF
-            download_url(self.url.format(filename), dir, filename=filename)
+        if model_config.get("pretrained_path", None):
+            path = model_config.pretrained_path
+            if not os.path.exists(path):
+                download_url(
+                    self.url.format(os.path.basename(path)),
+                    os.path.dirname(path),
+                    filename=os.path.basename(path),
+                )
 
-        ckpt_vit14 = torch.load(path)
-        self.encoder.load_state_dict(ckpt_vit14)
+            ckpt_vit14 = torch.load(path)
+            self.encoder.load_state_dict(ckpt_vit14)
 
         if model_config.freeze_backbone:
             self.freeze(self.encoder)
 
+        # TODO this embed dim could be pulled from the encoder, to remove the need for the arg
         self.linear_classifier = nn.Linear(
             model_config.embed_dim, data_config.num_classes
         )

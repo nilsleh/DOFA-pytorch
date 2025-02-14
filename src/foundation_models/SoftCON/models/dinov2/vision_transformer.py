@@ -55,6 +55,7 @@ class BlockChunk(nn.ModuleList):
         return x
 
 
+# TODO is this needed? Or can also be loaded from the HUB?
 class DinoVisionTransformer(nn.Module):
     def __init__(
         self,

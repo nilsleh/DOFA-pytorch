@@ -81,7 +81,6 @@ class DinoV2Classification(LightningTask):
         return self.criterion(outputs[0], labels)
 
     def forward(self, samples):
-        x_dict = {"imgs": samples}
         out = self.encoder.forward_features(samples)
         global_pooled = out["x_norm_patchtokens"].mean(dim=1)
         out_logits = self.linear_classifier(global_pooled)
