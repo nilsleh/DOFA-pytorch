@@ -129,7 +129,6 @@ To run evaluation on any of the models, you can use the following example:
 
 ```bash
 export $(cat .env)
-export MODEL_SIZE=base #can be base or large
 echo "Output Directory": $ODIR
 echo "Model Size": $MODEL_SIZE
 
