@@ -49,6 +49,8 @@ dependencies = [
 
 [tool.pytest.ini_options]
 
+addopts = "--cov --cov-report term-missing"
+
 filterwarnings = [
     # Expected warnings
     # ignore num workers
@@ -59,4 +61,5 @@ filterwarnings = [
     # ignore xformers
     "ignore:xFormers is not available:UserWarning"
 ]
+
 

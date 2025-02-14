@@ -10,8 +10,6 @@ from mmseg.models.necks import Feature2Pyramid
 from mmseg.models.decode_heads import UPerHead, FCNHead
 from ..util.misc import resize, seg_metric, cls_metric
 
-# TODO can this just be replaced with the torchgeo version?
-
 
 class CromaClassification(LightningTask):
     url = "https://huggingface.co/antofuller/CROMA/resolve/main/{}"

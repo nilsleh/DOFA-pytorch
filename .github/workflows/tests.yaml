@@ -36,6 +36,8 @@ jobs:
         if: ${{ runner.os != 'macOS' }}
       - name: Install pip dependencies
         if: steps.cache.outputs.cache-hit != 'true'
+        env:
+          MMCV_WITHOUT_EXT: "1"
         run: |
           pip install -U openmim
           pip install torch==2.1.2

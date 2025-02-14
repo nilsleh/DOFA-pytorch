@@ -12,6 +12,8 @@ from torchvision.datasets.utils import download_url
 
 
 class SoftConClassification(LightningTask):
+    """SoftCon model for classification."""
+
     url = "https://huggingface.co/wangyi111/softcon/resolve/main/{}"
 
     def __init__(self, args, model_config, data_config):
@@ -19,6 +21,7 @@ class SoftConClassification(LightningTask):
 
         # load dino model
         self.encoder = torch.hub.load("facebookresearch/dinov2", "dinov2_vitb14")
+        # add softcon input layer
         self.encoder.patch_embed.proj = torch.nn.Conv2d(
             model_config.num_channels, 384, kernel_size=(14, 14), stride=(14, 14)
         )
@@ -76,11 +79,14 @@ class SoftConClassification(LightningTask):
 
 
 class SoftConSegmentation(LightningTask):
+    """SoftCon Model for Segmentation."""
+
     def __init__(self, args, model_config, data_config):
         super().__init__(args, model_config, data_config)
 
         # load dino model
         self.encoder = torch.hub.load("facebookresearch/dinov2", "dinov2_vitb14")
+        # add softcon input layer
         self.encoder.patch_embed.proj = torch.nn.Conv2d(
             model_config.num_channels, 384, kernel_size=(14, 14), stride=(14, 14)
         )
