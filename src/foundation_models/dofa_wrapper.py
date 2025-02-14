@@ -124,15 +124,20 @@ class DofaClassification(LightningTask):
             return list(self.encoder.head.parameters()) + lora_params
         elif self.full_finetune:
             return list(self.encoder.parameters())
-        elif self.model_config.get('trainable_layers', None):
-            # find layer names of trainable layers and return their parameters
-            trainable_layers = self.model_config.trainable_layers
-            trainable_params = []
+        elif self.model_config.get('trainable_params', None):
+            trainable_params = self.model_config.trainable_params
+            params_to_optimize = []
             for name, param in self.encoder.named_parameters():
-                for layer in trainable_layers:
+                for layer in trainable_params:
                     if layer in name:
-                        trainable_params.append(param)
-            return trainable_params
+                        params_to_optimize.append(param)
+
+            if not params_to_optimize:
+                model_params = [name for name, _ in self.encoder.named_parameters()]
+                raise ValueError(
+                    f"No trainable layers found. Check the layer names in the model. Looking at `self.encoder.named_parameters()`, we have found {model_params}"
+                )
+            return params_to_optimize + list(self.encoder.head.parameters())
         else:
             return list(self.encoder.head.parameters())
 

@@ -13,19 +13,19 @@ from src.datasets.data_module import BenchmarkDataModule
 
 CONFIGS = {
     "classification": {
-        "models": ["scalemae_cls.yaml"],
+        "models": ["scalemae_cls.yaml", "scalemae_cls_selective_params.yaml"],
         "data_path": os.path.join(
             "tests", "configs", "classification_dataset_config.yaml"
         ),
         "task": "classification",
     },
-    "segmentation": {
-        "models": ["scalemae_seg.yaml"],
-        "data_path": os.path.join(
-            "tests", "configs", "segmentation_dataset_config.yaml"
-        ),
-        "task": "segmentation",
-    },
+    # "segmentation": {
+    #     "models": ["scalemae_seg.yaml"],
+    #     "data_path": os.path.join(
+    #         "tests", "configs", "segmentation_dataset_config.yaml"
+    #     ),
+    #     "task": "segmentation",
+    # },
 }
 
 

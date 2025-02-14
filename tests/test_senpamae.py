@@ -13,6 +13,7 @@ from hydra import compose, initialize
 
 classification_configs = [
     "senpamae_cls",
+    "senpamae_cls_selective_params"
 ]
 
 

@@ -16,6 +16,8 @@ class GFMClassification(LightningTask):
     def __init__(self, args, model_config, data_config):
         super().__init__(args, model_config, data_config)
 
+        self.full_finetune = model_config.get("full_finetune", False)
+
         model_config.num_classes = data_config.num_classes
         self.encoder = build_swin_cls(model_config)
 
@@ -27,6 +29,7 @@ class GFMClassification(LightningTask):
             in_features=self.encoder.head.in_features,
             num_classes=data_config.num_classes,
         )
+        trunc_normal_(self.encoder.head.head[1].weight, std=0.01)
         self.unfreeze(self.encoder.head)
 
         self.criterion = (
@@ -43,7 +46,26 @@ class GFMClassification(LightningTask):
         return (out_logits, feats) if self.model_config.out_features else out_logits
 
     def params_to_optimize(self):
-        return self.encoder.head.parameters()
+        if self.full_finetune:
+            return list(self.encoder.parameters())
+        elif self.model_config.get('trainable_params', None):
+            # find layer names of trainable layers and return their parameters
+            trainable_params = self.model_config.trainable_params
+            params_to_optimize = []
+            for name, param in self.encoder.named_parameters():
+                for layer in trainable_params:
+                    if layer in name:
+                        params_to_optimize.append(param)
+
+            if not params_to_optimize:
+                model_params = [name for name, _ in self.encoder.named_parameters()]
+                raise ValueError(
+                    f"No trainable layers found. Check the layer names in the model. Looking at `self.encoder.named_parameters()`, we have found {model_params}"
+                )
+            
+            return params_to_optimize + list(self.encoder.head.parameters())
+        else:
+            return list(self.encoder.head.parameters())
 
     def log_metrics(self, outputs, targets, prefix="train"):
         # Calculate accuracy and other classification-specific metrics

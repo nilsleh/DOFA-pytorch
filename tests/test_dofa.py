@@ -13,8 +13,7 @@ from src.datasets.data_module import BenchmarkDataModule
 
 CONFIGS = {
     "classification": {
-        # "models": ["dofa_cls_linear_probe.yaml", "dofa_cls.yaml", "dofa_cls_lora.yaml", "dofa_cls_selective_layers.yaml"],
-        "models": ["dofa_cls_selective_layers.yaml"],
+        "models": ["dofa_cls_linear_probe.yaml", "dofa_cls.yaml", "dofa_cls_lora.yaml", "dofa_cls_selective_params.yaml"],
         "data_path": os.path.join(
             "tests", "configs", "classification_dataset_config.yaml"
         ),
@@ -31,8 +30,9 @@ CONFIGS = {
 
 
 @pytest.fixture(
-    params=[("classification", cfg) for cfg in CONFIGS["classification"]["models"]]
-    + [("segmentation", cfg) for cfg in CONFIGS["segmentation"]["models"]]
+    params=[
+        (task, model_name) for task in CONFIGS for model_name in CONFIGS[task]["models"]
+    ]
 )
 def task_and_config(request):
     task_type, model_config_name = request.param

@@ -13,7 +13,7 @@ from src.datasets.data_module import BenchmarkDataModule
 
 CONFIGS = {
     "classification": {
-        "models": ["gfm_cls.yaml"],
+        "models": ["gfm_cls.yaml", "gfm_cls_selective_params.yaml"],
         "data_path": os.path.join(
             "tests", "configs", "classification_dataset_config.yaml"
         ),

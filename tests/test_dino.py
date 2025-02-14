@@ -16,6 +16,7 @@ from src.datasets.data_module import BenchmarkDataModule
 CONFIGS = {
     "classification": {
         "models": [
+            "dinov2_cls_selective_params.yaml",
             "dinov2_b_cls_linear_probe.yaml",
             "dinov2_cls_linear_probe.yaml",
             "dinov2_cls.yaml",

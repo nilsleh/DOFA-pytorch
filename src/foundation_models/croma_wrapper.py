@@ -19,6 +19,8 @@ class CromaClassification(LightningTask):
     def __init__(self, args, model_config, data_config):
         super().__init__(args, model_config, data_config)
 
+        self.full_finetune = model_config.get("full_finetune", False)
+
         # look for pretrained weights
         if model_config.get("pretrained_path", None):
             path = model_config.pretrained_path
@@ -45,9 +47,8 @@ class CromaClassification(LightningTask):
 
         # TODO the original croma model has more layers in the head
         # why do we truncate it?
-        self.encoder.s2_GAP_FFN[1] = LinearHead(
-            in_features=self.encoder.s2_GAP_FFN[1].in_features,
-            num_classes=data_config.num_classes,
+        self.encoder.s2_GAP_FFN[1] = torch.nn.Linear(
+            self.encoder.s2_GAP_FFN[1].in_features, data_config.num_classes
         )
         del self.encoder.s2_GAP_FFN[2:]
         self.unfreeze(self.encoder.s2_GAP_FFN[1])
@@ -68,7 +69,24 @@ class CromaClassification(LightningTask):
         return (out_logits, feats) if self.model_config.out_features else out_logits
 
     def params_to_optimize(self):
-        return self.encoder.s2_GAP_FFN[1].parameters()
+        if self.full_finetune:
+            return self.encoder.parameters()
+        elif self.model_config.get('trainable_params', None):
+            trainable_params = self.model_config.trainable_params
+            params_to_optimize = []
+            for name, param in self.encoder.named_parameters():
+                for layer in trainable_params:
+                    if layer in name:
+                        params_to_optimize.append(param)
+
+            if not params_to_optimize:
+                model_params = [name for name, _ in self.encoder.named_parameters()]
+                raise ValueError(
+                    f"No trainable layers found. Check the layer names in the model. Looking at `self.encoder.named_parameters()`, we have found {model_params}"
+                )
+            return params_to_optimize + list(self.self.encoder.s2_GAP_FFN[1].parameters())
+        else:
+            return self.encoder.s2_GAP_FFN[1].parameters()
 
     def log_metrics(self, outputs, targets, prefix="train"):
         # Calculate accuracy and other classification-specific metrics

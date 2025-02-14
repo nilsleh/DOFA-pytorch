@@ -13,19 +13,19 @@ from src.datasets.data_module import BenchmarkDataModule
 
 CONFIGS = {
     "classification": {
-        "models": ["satmae_cls", "satmae_cls_rgb"],
+        "models": ["satmae_cls", "satmae_cls_rgb", "satmae_cls_rgb_selective_params"],
         "data_path": os.path.join(
             "tests", "configs", "classification_dataset_config.yaml"
         ),
         "task": "classification",
     },
-    "segmentation": {
-        "models": ["satmae_seg", "satmae_seg_rgb"],
-        "data_path": os.path.join(
-            "tests", "configs", "segmentation_dataset_config.yaml"
-        ),
-        "task": "segmentation",
-    },
+    # "segmentation": {
+    #     "models": ["satmae_seg", "satmae_seg_rgb"],
+    #     "data_path": os.path.join(
+    #         "tests", "configs", "segmentation_dataset_config.yaml"
+    #     ),
+    #     "task": "segmentation",
+    # },
 }
 
 

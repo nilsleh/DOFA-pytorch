@@ -60,7 +60,7 @@ class SenPaMAEClassification(LightningTask):
         self.linear_classifier = LinearHead(
             in_features=model_config.embed_dim, num_classes=data_config.num_classes
         )
-        trunc_normal_(self.linear_classifier.weight, std=0.01)
+        trunc_normal_(self.linear_classifier.head[1].weight, std=0.01)
 
         self.encoder.head = nn.Sequential(
             nn.BatchNorm1d(model_config.embed_dim, affine=False, eps=1e-6),
@@ -169,8 +169,22 @@ class SenPaMAEClassification(LightningTask):
             # Include LoRA parameters for optimization
             lora_params = [p for n, p in self.encoder.named_parameters() if "lora" in n]
             return list(self.encoder.head.parameters()) + lora_params
-        if self.full_finetune:
+        elif self.full_finetune:
             return list(self.encoder.parameters())
+        elif self.model_config.get("trainable_params", None):
+            trainable_params = self.model_config.trainable_params
+            params_to_optimize = []
+            for name, param in self.encoder.named_parameters():
+                for layer in trainable_params:
+                    if layer in name:
+                        params_to_optimize.append(param)
+
+            if not params_to_optimize:
+                model_params = [name for name, _ in self.encoder.named_parameters()]
+                raise ValueError(
+                    f"No trainable layers found. Check the layer names in the model. Looking at `self.encoder.named_parameters()`, we have found {model_params}"
+                )
+            return params_to_optimize + self.encoder.head.parameters()
         else:
             return list(self.encoder.head.parameters())
 

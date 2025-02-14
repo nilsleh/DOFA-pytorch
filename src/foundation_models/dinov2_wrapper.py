@@ -93,10 +93,24 @@ class DinoV2Classification(LightningTask):
             # Include LoRA parameters for optimization
             lora_params = [p for n, p in self.encoder.named_parameters() if "lora" in n]
             return list(self.linear_classifier.parameters()) + lora_params
-        if self.full_finetune:
+        elif self.full_finetune:
             return list(self.encoder.parameters()) + list(
                 self.linear_classifier.parameters()
             )
+        elif self.model_config.get('trainable_params', None):
+            trainable_params = self.model_config.trainable_params
+            trainable_params = []
+            for name, param in self.encoder.named_parameters():
+                for layer in trainable_params:
+                    if layer in name:
+                        trainable_params.append(param)
+            if not trainable_params:
+                model_layers = [name for name, _ in self.encoder.named_parameters()]
+                raise ValueError(
+                    f"No trainable layers found. Check the layer names in the model. Looking at `self.encoder.named_parameters()`, we have found {model_layers}"
+                )
+            
+            return trainable_params + list(self.linear_classifier.parameters())
         else:
             return list(self.linear_classifier.parameters())
 
