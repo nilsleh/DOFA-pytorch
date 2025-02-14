@@ -9,7 +9,6 @@ from src.factory import model_registry
 from src.datasets.data_module import BenchmarkDataModule
 from omegaconf import OmegaConf
 from lightning import Trainer
-from pytest import MonkeyPatch
 from hydra import compose, initialize
 
 classification_configs = [
@@ -17,7 +16,7 @@ classification_configs = [
 ]
 
 
-class TestClassificationModels:
+class TestClassificationSenpaMAE:
     @pytest.fixture()
     def other_args(self):
         args = argparse.Namespace()
@@ -72,7 +71,6 @@ class TestClassificationModels:
         model_config,
         other_args,
         data_config,
-        monkeypatch: MonkeyPatch,
         tmp_path: Path,
     ):
         model_name = model_config.model_type
@@ -80,6 +78,8 @@ class TestClassificationModels:
         if model_class is None:
             raise ValueError(f"Model type '{model_name}' not found.")
 
+        # Set environment variable for weights directory
+        os.environ["MODEL_WEIGHTS_DIR"] = str(tmp_path)
         model_file_name = os.path.basename(model_config.pretrained_path)
 
         model_config.pretrained_path = None

@@ -45,6 +45,7 @@ class DummyDataset(Dataset):
         num_classes: int,
         split: str,
         transforms: Any,
+        task: str = "classification",
         num_samples: int = 2,
     ) -> None:
         super().__init__()
@@ -54,6 +55,7 @@ class DummyDataset(Dataset):
         self.img_size = img_size
         self.num_classes = num_classes
         self.channels = num_channels
+        self.task = task
 
     def __len__(self) -> int:
         return self.num_samples
@@ -61,7 +63,10 @@ class DummyDataset(Dataset):
     def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
         # Generate random image and label
         image = torch.rand(self.channels, *self.img_size)
-        label = torch.randint(0, self.num_classes, (1,)).squeeze(0)
+        if self.task == "classification":
+            label = torch.randint(0, self.num_classes, (1,)).squeeze(0)
+        else:
+            label = torch.randint(0, self.num_classes, (1, *self.img_size)).squeeze(0)
         sample = {"image": image, "label": label}
 
         if self.transforms is not None:
@@ -77,6 +82,7 @@ class DummyWrapper:
         self.img_size = (config.image_resolution, config.image_resolution)
         self.num_classes = config.num_classes
         self.num_channels = config.num_channels
+        self.task = config.task
 
     def create_dataset(self) -> Tuple[Dataset, Dataset, Dataset]:
         """Create train, validation and test datasets."""
@@ -88,6 +94,7 @@ class DummyWrapper:
             transforms=train_transform,
             img_size=self.img_size,
             num_samples=2,
+            task=self.task,
             num_classes=self.num_classes,
             num_channels=self.num_channels,
         )
@@ -96,6 +103,7 @@ class DummyWrapper:
             transforms=eval_transform,
             img_size=self.img_size,
             num_samples=1,
+            task=self.task,
             num_classes=self.num_classes,
             num_channels=self.num_channels,
         )
@@ -104,6 +112,7 @@ class DummyWrapper:
             transforms=eval_transform,
             img_size=self.img_size,
             num_samples=1,
+            task=self.task,
             num_classes=self.num_classes,
             num_channels=self.num_channels,
         )

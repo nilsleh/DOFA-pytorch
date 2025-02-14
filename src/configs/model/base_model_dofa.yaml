@@ -8,6 +8,6 @@ image_resolution: 224
 additional_params: {}
 multilabel: false
 out_features: true
-embed_dim: 1024
+embed_dim: 768
 pretrained_path: ${oc.env:MODEL_WEIGHTS_DIR}/DOFA_ViT_${size}_e100.pth
 full_finetune: false

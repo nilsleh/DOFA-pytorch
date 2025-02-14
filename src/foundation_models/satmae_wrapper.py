@@ -88,6 +88,8 @@ class SatMAEClassification(LightningTask):
 
 
 class SatMAESegmentation(LightningTask):
+    url = "https://huggingface.co/mubashir04/{}/resolve/main/{}"
+
     def __init__(self, args, model_config, data_config):
         super().__init__(args, model_config, data_config)
 
@@ -101,10 +103,18 @@ class SatMAESegmentation(LightningTask):
         else:
             self.encoder = vit_large_patch16_seg_rgb(**kwargs)
 
-        # Load pretrained weights
-        checkpoint = torch.load(model_config.pretrained_path, map_location="cpu")
-        checkpoint_model = checkpoint["model"]
-        msg = self.encoder.load_state_dict(checkpoint_model, strict=False)
+        # look for pretrained weights
+        if model_config.get("pretrained_path", None):
+            path = model_config.pretrained_path
+            if not os.path.exists(path):
+                download_url(
+                    self.url.format(os.path.basename(path)),
+                    os.path.dirname(path),
+                    filename=os.path.basename(path),
+                )
+            checkpoint = torch.load(model_config.pretrained_path, map_location="cpu")
+            checkpoint_model = checkpoint["model"]
+            msg = self.encoder.load_state_dict(checkpoint_model, strict=False)
 
         if model_config.freeze_backbone:
             self.freeze(self.encoder)

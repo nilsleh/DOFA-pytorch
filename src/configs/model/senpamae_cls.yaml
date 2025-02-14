@@ -7,4 +7,4 @@ embed_dim: 768
 image_size: 144
 task: classification
 full_finetune: false
-pretrained_path: 'basemae.pt'
+pretrained_path: ${oc.env:MODEL_WEIGHTS_DIR}/basemae.pt

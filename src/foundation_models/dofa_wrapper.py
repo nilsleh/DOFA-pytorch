@@ -139,6 +139,8 @@ class DofaClassification(LightningTask):
 
 
 class DofaSegmentation(LightningTask):
+    url = "https://huggingface.co/earthflow/dofa/resolve/main/{}"
+
     def __init__(self, args, model_config, data_config):
         super().__init__(args, model_config, data_config)
         self.encoder = (
@@ -152,8 +154,18 @@ class DofaSegmentation(LightningTask):
         )
 
         # Load pretrained weights
-        check_point = torch.load(model_config.pretrained_path)
-        self.encoder.load_state_dict(check_point, strict=False)
+        if model_config.get("pretrained_path", None):
+            path = model_config.pretrained_path
+            if not os.path.exists(path):
+                # download the weights from HF
+                download_url(
+                    self.url.format(os.path.basename(path)),
+                    os.path.dirname(path),
+                    filename=os.path.basename(path),
+                )
+
+            check_point = torch.load(model_config.pretrained_path)
+            self.encoder.load_state_dict(check_point, strict=False)
 
         if model_config.freeze_backbone:
             self.freeze(self.encoder)

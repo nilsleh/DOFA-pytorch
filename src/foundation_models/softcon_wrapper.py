@@ -92,8 +92,18 @@ class SoftConSegmentation(LightningTask):
             num_register_tokens=0,
         )
 
-        ckpt_vit14 = torch.load(model_config.pretrained_path)
-        self.encoder.load_state_dict(ckpt_vit14)
+        # look for pretrained weights
+        if model_config.get("pretrained_path", None):
+            path = model_config.pretrained_path
+            if not os.path.exists(path):
+                download_url(
+                    self.url.format(os.path.basename(path)),
+                    os.path.dirname(path),
+                    filename=os.path.basename(path),
+                )
+
+            ckpt_vit14 = torch.load(path)
+            self.encoder.load_state_dict(ckpt_vit14)
 
         if model_config.freeze_backbone:
             self.freeze(self.encoder)
