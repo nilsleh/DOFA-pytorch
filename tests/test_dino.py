@@ -7,10 +7,10 @@ import pytest
 from hydra import compose, initialize
 from omegaconf import OmegaConf
 from lightning import Trainer
+import torch.nn as nn
 
 from src.factory import model_registry
 from src.datasets.data_module import BenchmarkDataModule
-from src.foundation_models.SoftCON.models.dinov2.vision_transformer import vit_base
 
 
 CONFIGS = {
@@ -35,11 +35,30 @@ CONFIGS = {
 }
 
 
-# mock torch.hub.load to avoid downloading the model
-# with the softcon dinov2 implementation
+# have a dummy model to mock the `torch.hub.load()` during tests
+class DummyDinoModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.embed_dim = 384
+        self.patch_embed = nn.Module()
+        self.patch_embed.proj = nn.Identity()
+        self.blocks = [1, 2]
+
+    def forward_features(self, x):
+        B = x.size(0)
+        return {
+            "x_norm_patchtokens": torch.randn(B, 196, self.embed_dim, device=x.device)
+        }
+
+    def get_intermediate_layers(self, x, layers):
+        B = x.size(0)
+        dummy_out = torch.randn(B, 196, 384, device=x.device)
+        return [dummy_out for _ in layers]
+
+
 @pytest.fixture(autouse=True)
 def mock_torch_hub_load(monkeypatch):
-    monkeypatch.setattr(torch.hub, "load", lambda *args, **kwargs: vit_base())
+    monkeypatch.setattr(torch.hub, "load", lambda *args, **kwargs: DummyDinoModel())
 
 
 @pytest.fixture(

@@ -1,4 +1,3 @@
-from .SoftCON.models.dinov2 import vision_transformer as dinov2_vit
 import torch.nn as nn
 import torch
 import os
@@ -18,16 +17,13 @@ class SoftConClassification(LightningTask):
     def __init__(self, args, model_config, data_config):
         super().__init__(args, model_config, data_config)
 
-        self.encoder = dinov2_vit.__dict__[model_config.softcon_size](
-            img_size=model_config.image_resolution,
-            patch_size=14,
-            in_chans=model_config.num_channels,
-            block_chunks=0,
-            init_values=1e-5,
-            num_register_tokens=0,
+        # load dino model
+        self.encoder = torch.hub.load("facebookresearch/dinov2", "dinov2_vitb14")
+        self.encoder.patch_embed.proj = torch.nn.Conv2d(
+            model_config.num_channels, 384, kernel_size=(14, 14), stride=(14, 14)
         )
 
-        # look for pretrained weights
+        # look for Softcon pretrained weights
         if model_config.get("pretrained_path", None):
             path = model_config.pretrained_path
             if not os.path.exists(path):
@@ -83,16 +79,13 @@ class SoftConSegmentation(LightningTask):
     def __init__(self, args, model_config, data_config):
         super().__init__(args, model_config, data_config)
 
-        self.encoder = dinov2_vit.__dict__[model_config.softcon_size](
-            img_size=model_config.image_resolution,
-            patch_size=14,
-            in_chans=model_config.num_channels,
-            block_chunks=0,
-            init_values=1e-5,
-            num_register_tokens=0,
+        # load dino model
+        self.encoder = torch.hub.load("facebookresearch/dinov2", "dinov2_vitb14")
+        self.encoder.patch_embed.proj = torch.nn.Conv2d(
+            model_config.num_channels, 384, kernel_size=(14, 14), stride=(14, 14)
         )
 
-        # look for pretrained weights
+        # look for Softcon pretrained weights
         if model_config.get("pretrained_path", None):
             path = model_config.pretrained_path
             if not os.path.exists(path):
