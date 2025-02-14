@@ -65,7 +65,7 @@ class ScaleMAEClassification(LightningTask):
     def params_to_optimize(self):
         if self.full_finetune:
             return self.parameters()
-        elif self.model_config.get('trainable_params'):
+        elif self.model_config.get("trainable_params"):
             trainable_params = self.model_config.trainable_params
             params_to_optimize = []
             for name, param in self.encoder.named_parameters():

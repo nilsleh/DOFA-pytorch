@@ -68,7 +68,7 @@ class SoftConClassification(LightningTask):
     def params_to_optimize(self):
         if self.full_finetune:
             return self.encoder.parameters() + self.linear_classifier.parameters()
-        elif self.model_config.get('trainable_params', None):
+        elif self.model_config.get("trainable_params", None):
             trainable_params = self.model_config.trainable_params
             params_to_optimize = []
             for name, param in self.encoder.named_parameters():

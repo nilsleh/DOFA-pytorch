@@ -13,7 +13,7 @@ class AnySatClassification(LightningTask):
     def __init__(self, args, model_config, data_config):
         super().__init__(args, model_config, data_config)
 
-        self.full_finetune = model_config.get('full_finetune', False)
+        self.full_finetune = model_config.get("full_finetune", False)
 
         self.encoder = torch.hub.load(
             "gastruc/anysat", "anysat", pretrained=True, flash_attn=False
@@ -45,7 +45,7 @@ class AnySatClassification(LightningTask):
     def params_to_optimize(self):
         if self.full_finetune:
             return self.encoder.parameters() + self.linear_classifier.parameters()
-        elif self.model_config.get('trainable_params', None):
+        elif self.model_config.get("trainable_params", None):
             trainable_params = self.model_config.trainable_params
             params_to_optimize = []
             for name, param in self.encoder.named_parameters():
@@ -61,7 +61,6 @@ class AnySatClassification(LightningTask):
             return params_to_optimize + list(self.linear_classifier.parameters())
         else:
             return self.linear_classifier.parameters()
-
 
     def log_metrics(self, outputs, targets, prefix="train"):
         # Calculate accuracy and other classification-specific metrics

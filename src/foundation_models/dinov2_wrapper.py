@@ -97,7 +97,7 @@ class DinoV2Classification(LightningTask):
             return list(self.encoder.parameters()) + list(
                 self.linear_classifier.parameters()
             )
-        elif self.model_config.get('trainable_params', None):
+        elif self.model_config.get("trainable_params", None):
             trainable_params = self.model_config.trainable_params
             trainable_params = []
             for name, param in self.encoder.named_parameters():
@@ -109,7 +109,7 @@ class DinoV2Classification(LightningTask):
                 raise ValueError(
                     f"No trainable layers found. Check the layer names in the model. Looking at `self.encoder.named_parameters()`, we have found {model_layers}"
                 )
-            
+
             return trainable_params + list(self.linear_classifier.parameters())
         else:
             return list(self.linear_classifier.parameters())

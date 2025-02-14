@@ -71,7 +71,7 @@ class CromaClassification(LightningTask):
     def params_to_optimize(self):
         if self.full_finetune:
             return self.encoder.parameters()
-        elif self.model_config.get('trainable_params', None):
+        elif self.model_config.get("trainable_params", None):
             trainable_params = self.model_config.trainable_params
             params_to_optimize = []
             for name, param in self.encoder.named_parameters():
@@ -84,7 +84,9 @@ class CromaClassification(LightningTask):
                 raise ValueError(
                     f"No trainable layers found. Check the layer names in the model. Looking at `self.encoder.named_parameters()`, we have found {model_params}"
                 )
-            return params_to_optimize + list(self.self.encoder.s2_GAP_FFN[1].parameters())
+            return params_to_optimize + list(
+                self.self.encoder.s2_GAP_FFN[1].parameters()
+            )
         else:
             return self.encoder.s2_GAP_FFN[1].parameters()
 

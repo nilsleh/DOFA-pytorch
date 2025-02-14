@@ -76,8 +76,10 @@ class SatMAEClassification(LightningTask):
 
     def params_to_optimize(self):
         if self.full_finetune:
-            return list(self.encoder.parameters()) + list(self.linear_classifier.parameters())
-        elif self.model_config.get('trainable_params', None):
+            return list(self.encoder.parameters()) + list(
+                self.linear_classifier.parameters()
+            )
+        elif self.model_config.get("trainable_params", None):
             # find layer names of trainable layers and return their parameters
             trainable_params = self.model_config.trainable_params
             params_to_optimize = []

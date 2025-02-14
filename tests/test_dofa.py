@@ -13,7 +13,12 @@ from src.datasets.data_module import BenchmarkDataModule
 
 CONFIGS = {
     "classification": {
-        "models": ["dofa_cls_linear_probe.yaml", "dofa_cls.yaml", "dofa_cls_lora.yaml", "dofa_cls_selective_params.yaml"],
+        "models": [
+            "dofa_cls_linear_probe.yaml",
+            "dofa_cls.yaml",
+            "dofa_cls_lora.yaml",
+            "dofa_cls_selective_params.yaml",
+        ],
         "data_path": os.path.join(
             "tests", "configs", "classification_dataset_config.yaml"
         ),

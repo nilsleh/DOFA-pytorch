@@ -124,7 +124,7 @@ class DofaClassification(LightningTask):
             return list(self.encoder.head.parameters()) + lora_params
         elif self.full_finetune:
             return list(self.encoder.parameters())
-        elif self.model_config.get('trainable_params', None):
+        elif self.model_config.get("trainable_params", None):
             trainable_params = self.model_config.trainable_params
             params_to_optimize = []
             for name, param in self.encoder.named_parameters():

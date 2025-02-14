@@ -11,10 +11,7 @@ from omegaconf import OmegaConf
 from lightning import Trainer
 from hydra import compose, initialize
 
-classification_configs = [
-    "senpamae_cls",
-    "senpamae_cls_selective_params"
-]
+classification_configs = ["senpamae_cls", "senpamae_cls_selective_params"]
 
 
 class TestClassificationSenpaMAE:
