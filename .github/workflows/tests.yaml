@@ -47,5 +47,7 @@ jobs:
       - name: List pip dependencies
         run: pip list
       - name: Run pytest checks
+        env:
+            MMCV_WITHOUT_EXT: "1"
         run: |
           pytest
