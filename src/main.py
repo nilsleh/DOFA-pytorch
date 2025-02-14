@@ -35,6 +35,8 @@ def main(cfg: DictConfig):
     # Seed everything
     seed_everything(cfg.seed)
 
+    print(cfg)
+
     # Create output directory
     Path(cfg.output_dir).mkdir(parents=True, exist_ok=True)
 
@@ -63,16 +65,24 @@ def main(cfg: DictConfig):
     ]
 
     # Initialize trainer
-    trainer = Trainer(
-        logger=mlf_logger,
-        callbacks=callbacks,
-        strategy=DDPStrategy(find_unused_parameters=False)
-        if cfg.strategy == "ddp" and cfg.num_gpus > 1
-        else cfg.strategy,
-        devices=cfg.num_gpus,
-        max_epochs=cfg.epochs,
-        num_sanity_val_steps=0,
-    )
+    if cfg.strategy == "ddp" and cfg.num_gpus > 1:
+        trainer = Trainer(
+            logger=mlf_logger,
+            callbacks=callbacks,
+            strategy=DDPStrategy(find_unused_parameters=False),
+            devices=cfg.num_gpus,
+            max_epochs=cfg.epochs,
+            num_sanity_val_steps=0,
+        )
+    else:
+        trainer = Trainer(
+            logger=mlf_logger,
+            callbacks=callbacks,
+            devices=cfg.num_gpus,
+            max_epochs=cfg.epochs,
+            num_sanity_val_steps=0,
+        )
+
 
     # Initialize data module
     cfg.dataset.image_resolution = cfg.model.image_resolution

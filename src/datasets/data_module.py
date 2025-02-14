@@ -1,7 +1,6 @@
 from lightning import LightningDataModule
 import torch
-from ..factory import create_dataset
-
+from src.factory import create_dataset
 
 class BenchmarkDataModule(LightningDataModule):
     def __init__(self, dataset_config, batch_size, num_workers, pin_memory):

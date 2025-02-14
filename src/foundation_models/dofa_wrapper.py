@@ -94,7 +94,7 @@ class DofaClassification(LightningTask):
         peft_config = LoraConfig(
             r=lora_cfg.get("lora_rank", 16),  # Rank of LoRA
             lora_alpha=lora_cfg.get("lora_alpha", 16),  # Scaling factor for LoRA
-            target_modules=cfg.get(
+            target_modules=lora_cfg.get(
                 "lora_target_modules", "blocks.*.attn.qkv"
             ),  # ["qkv", "proj"]
             lora_dropout=lora_cfg.get("lora_dropout", 0.0),  # Dropout rate for LoRA
