@@ -10,6 +10,8 @@ from mmseg.models.necks import Feature2Pyramid
 from mmseg.models.decode_heads import UPerHead, FCNHead
 from ..util.misc import resize, seg_metric, cls_metric
 
+from src.foundation_models import LinearHead
+
 
 class CromaClassification(LightningTask):
     url = "https://huggingface.co/antofuller/CROMA/resolve/main/{}"
@@ -41,11 +43,14 @@ class CromaClassification(LightningTask):
         if model_config.freeze_backbone:
             self.freeze(self.encoder)
 
-        self.encoder.s2_GAP_FFN[1] = torch.nn.Linear(
-            self.encoder.s2_GAP_FFN[1].in_features, data_config.num_classes
+        # TODO the original croma model has more layers in the head
+        # why do we truncate it?
+        self.encoder.s2_GAP_FFN[1] = LinearHead(
+            in_features=self.encoder.s2_GAP_FFN[1].in_features,
+            num_classes=data_config.num_classes,
         )
-        self.unfreeze(self.encoder.s2_GAP_FFN[1])
         del self.encoder.s2_GAP_FFN[2:]
+        self.unfreeze(self.encoder.s2_GAP_FFN[1])
 
         self.criterion = (
             nn.MultiLabelSoftMarginLoss()

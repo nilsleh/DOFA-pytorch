@@ -9,6 +9,8 @@ from mmseg.models.decode_heads import UPerHead, FCNHead
 from timm.models.layers import trunc_normal_
 from ..util.misc import resize, seg_metric, cls_metric
 
+from src.foundation_models import LinearHead
+
 
 class GFMClassification(LightningTask):
     def __init__(self, args, model_config, data_config):
@@ -21,9 +23,9 @@ class GFMClassification(LightningTask):
             self.freeze(self.encoder)
 
         trunc_normal_(self.encoder.head.weight, std=0.01)
-        self.encoder.head = nn.Sequential(
-            nn.BatchNorm1d(self.encoder.head.in_features, affine=False, eps=1e-6),
-            self.encoder.head,
+        self.encoder.head = LinearHead(
+            in_features=self.encoder.head.in_features,
+            num_classes=data_config.num_classes,
         )
         self.unfreeze(self.encoder.head)
 

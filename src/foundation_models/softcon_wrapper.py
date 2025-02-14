@@ -10,6 +10,8 @@ from einops import rearrange
 from ..util.misc import resize, seg_metric, cls_metric
 from torchvision.datasets.utils import download_url
 
+from src.foundation_models import LinearHead
+
 
 class SoftConClassification(LightningTask):
     """SoftCon model for classification."""
@@ -43,8 +45,8 @@ class SoftConClassification(LightningTask):
             self.freeze(self.encoder)
 
         # TODO this embed dim could be pulled from the encoder, to remove the need for the arg
-        self.linear_classifier = nn.Linear(
-            model_config.embed_dim, data_config.num_classes
+        self.linear_classifier = LinearHead(
+            in_features=model_config.embed_dim, num_classes=data_config.num_classes
         )
         self.criterion = (
             nn.MultiLabelSoftMarginLoss()

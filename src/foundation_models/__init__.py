@@ -8,3 +8,4 @@ from .dofa_wrapper import DofaModel
 from .satmae_wrapper import SatMAEModel
 from .anysat_wrapper import AnySatModel  # type: ignore
 from .senpamae_wrapper import SenPaMAEModel
+from .base import LinearHead

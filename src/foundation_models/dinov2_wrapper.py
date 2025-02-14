@@ -16,6 +16,8 @@ from timm.models.layers import trunc_normal_
 from torch.nn.init import normal_
 from peft import LoraConfig, get_peft_model
 
+from src.foundation_models import LinearHead
+
 
 # from .modules import SpatialPriorModule, InteractionBlock, deform_inputs
 
@@ -48,8 +50,8 @@ class DinoV2Classification(LightningTask):
             else:
                 self.freeze(self.encoder)
 
-        self.linear_classifier = nn.Linear(
-            self.encoder.embed_dim, data_config.num_classes
+        self.linear_classifier = LinearHead(
+            in_features=self.encoder.embed_dim, num_classes=data_config.num_classes
         )
 
         self.criterion = (

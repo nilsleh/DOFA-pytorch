@@ -117,6 +117,11 @@ Any model config parameter can always be overwritten by `model.{param_name}={som
 
 Need to explain how to run LORA
 
+### Running Unit Tests
+
+We have implemented a series of unit tests that aim to test that there are no runtime bugs. They will also be run on new PRs to check that changes are not breaking other parts. To run the tests you need to `pip install pytest`, and then from the root directory simply run `pytest tests/` which will run all tests file inside the `tests/` directory, or run `pytest tests/test_{model_name}` for any specific unit test file in there.
+
+
 ## Running Experiments
 
 To run evaluation on any of the models, you can use the following example:

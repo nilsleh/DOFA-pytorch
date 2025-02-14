@@ -13,6 +13,8 @@ from .SenPaMAE.model import vit_base_patch16
 import hydra
 import numpy as np
 
+from src.foundation_models import LinearHead
+
 
 class SenPaMAEClassification(LightningTask):
     url = "https://drive.google.com/file/d/16IoG47yzdyUnPqUgaV8ofeja5RgQjlAz"
@@ -56,8 +58,8 @@ class SenPaMAEClassification(LightningTask):
             self.apply_peft(self.encoder, lora_cfg=model_config.lora)
 
         # setup linear head
-        self.linear_classifier = torch.nn.Linear(
-            model_config.embed_dim, data_config.num_classes
+        self.linear_classifier = LinearHead(
+            in_features=model_config.embed_dim, num_classes=data_config.num_classes
         )
         trunc_normal_(self.linear_classifier.weight, std=0.01)
 

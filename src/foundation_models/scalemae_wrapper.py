@@ -12,6 +12,8 @@ from ..util.misc import resize, seg_metric, cls_metric
 from .lightning_task import LightningTask
 from torchvision.datasets.utils import download_url
 
+from src.foundation_models import LinearHead
+
 
 class ScaleMAEClassification(LightningTask):
     url = "https://huggingface.co/torchgeo/{}/resolve/main/{}"
@@ -40,8 +42,8 @@ class ScaleMAEClassification(LightningTask):
         if model_config.freeze_backbone:
             self.freeze(self.encoder)  # look for pretrained weights
 
-        self.linear_classifier = torch.nn.Linear(
-            model_config.embed_dim, data_config.num_classes
+        self.linear_classifier = LinearHead(
+            in_features=model_config.embed_dim, num_classes=data_config.num_classes
         )
 
         self.criterion = (

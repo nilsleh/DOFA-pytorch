@@ -13,6 +13,8 @@ from ..util.misc import resize, seg_metric, cls_metric
 from torchvision.datasets.utils import download_url
 from peft import LoraConfig, get_peft_model
 
+from src.foundation_models import LinearHead
+
 
 class DofaClassification(LightningTask):
     url = "https://huggingface.co/earthflow/dofa/resolve/main/{}"
@@ -63,9 +65,12 @@ class DofaClassification(LightningTask):
                 self.freeze(self.encoder)
 
         trunc_normal_(self.encoder.head.weight, std=0.01)
-        self.encoder.head = nn.Sequential(
-            nn.BatchNorm1d(self.encoder.head.in_features, affine=False, eps=1e-6),
-            self.encoder.head,
+        # self.encoder.head = nn.Sequential(
+        #     nn.BatchNorm1d(self.encoder.head.in_features, affine=False, eps=1e-6),
+        #     self.encoder.head,
+        # )
+        self.encoder.head = LinearHead(
+            self.encoder.head.in_features, data_config.num_classes
         )
         self.unfreeze(self.encoder.head)
 

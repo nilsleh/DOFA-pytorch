@@ -31,7 +31,6 @@ def print_trainable_parameters(model):
 
 @hydra.main(config_path="configs", config_name="config")
 def main(cfg: DictConfig):
-    print(f"MODEL_SIZE: {os.getenv('MODEL_SIZE')}")
     # Seed everything
     seed_everything(cfg.seed)
 
