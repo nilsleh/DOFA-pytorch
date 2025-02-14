@@ -21,3 +21,6 @@ ray==2.40.0
 huggingface-hub==0.26.2
 peft==0.14.0
 optuna==4.1.0
+torch==2.1.2
+torchvision==0.16.2
+numpy==1.26.4
