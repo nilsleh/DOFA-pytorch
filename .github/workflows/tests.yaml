@@ -41,6 +41,7 @@ jobs:
         run: |
           pip install -U openmim
           pip install torch==2.1.2
+          mim install mmengine
           mim install mmcv==2.1.0 mmsegmentation==1.2.2
           pip install -r requirements/required.txt -r requirements/tests.txt
           pip cache purge
