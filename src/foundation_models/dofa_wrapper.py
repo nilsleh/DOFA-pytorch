@@ -37,8 +37,6 @@ class DofaClassification(LightningTask):
             else vit_base_patch16_cls(num_classes=data_config.num_classes)
         )
 
-        # print(self.encoder)
-
         # look for pretrained weights
         if model_config.get("pretrained_path", None):
             path = model_config.pretrained_path
@@ -124,8 +122,17 @@ class DofaClassification(LightningTask):
             # Include LoRA parameters for optimization
             lora_params = [p for n, p in self.encoder.named_parameters() if "lora" in n]
             return list(self.encoder.head.parameters()) + lora_params
-        if self.full_finetune:
+        elif self.full_finetune:
             return list(self.encoder.parameters())
+        elif self.model_config.get('trainable_layers', None):
+            # find layer names of trainable layers and return their parameters
+            trainable_layers = self.model_config.trainable_layers
+            trainable_params = []
+            for name, param in self.encoder.named_parameters():
+                for layer in trainable_layers:
+                    if layer in name:
+                        trainable_params.append(param)
+            return trainable_params
         else:
             return list(self.encoder.head.parameters())
 

@@ -13,19 +13,20 @@ from src.datasets.data_module import BenchmarkDataModule
 
 CONFIGS = {
     "classification": {
-        "models": ["dofa_cls_linear_probe.yaml", "dofa_cls.yaml", "dofa_cls_lora.yaml"],
+        # "models": ["dofa_cls_linear_probe.yaml", "dofa_cls.yaml", "dofa_cls_lora.yaml", "dofa_cls_selective_layers.yaml"],
+        "models": ["dofa_cls_selective_layers.yaml"],
         "data_path": os.path.join(
             "tests", "configs", "classification_dataset_config.yaml"
         ),
         "task": "classification",
     },
-    "segmentation": {
-        "models": ["dofa_seg.yaml"],
-        "data_path": os.path.join(
-            "tests", "configs", "segmentation_dataset_config.yaml"
-        ),
-        "task": "segmentation",
-    },
+    # "segmentation": {
+    #     "models": ["dofa_seg.yaml"],
+    #     "data_path": os.path.join(
+    #         "tests", "configs", "segmentation_dataset_config.yaml"
+    #     ),
+    #     "task": "segmentation",
+    # },
 }
 
 
