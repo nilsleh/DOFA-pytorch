@@ -70,7 +70,7 @@ class LightningTask(LightningModule):
         return loss
 
     def configure_optimizers(self):
-        if self.model_config.task == "classification":
+        if self.model_config.task in ["classification", "regression"]:
             optimizer = torch.optim.SGD(
                 self.params_to_optimize(),
                 lr=self.args.lr,
