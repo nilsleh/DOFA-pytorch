@@ -63,10 +63,7 @@ class DofaClassification(LightningTask):
                 self.freeze(self.encoder)
 
         trunc_normal_(self.encoder.head.weight, std=0.01)
-        # self.encoder.head = nn.Sequential(
-        #     nn.BatchNorm1d(self.encoder.head.in_features, affine=False, eps=1e-6),
-        #     self.encoder.head,
-        # )
+
         self.encoder.head = LinearHead(
             self.encoder.head.in_features, data_config.num_classes
         )
@@ -160,7 +157,6 @@ class DofaRegression(DofaClassification):
         super().__init__(args, model_config, data_config)
 
         self.criterion = nn.MSELoss()
-
 
     def log_metrics(self, outputs, targets, prefix="train"):
         # Calculate accuracy and other classification-specific metrics
@@ -266,6 +262,7 @@ class DofaSegmentation(LightningTask):
 
 # Model factory for different dinov2 tasks
 def DofaModel(args, model_config, data_config):
+    print("AARGS: ", args)
     if args.task == "classification":
         return DofaClassification(args, model_config, data_config)
     elif args.task == "regression":

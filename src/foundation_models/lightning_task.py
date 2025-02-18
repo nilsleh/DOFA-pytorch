@@ -47,7 +47,6 @@ class LightningTask(LightningModule):
     def training_step(self, batch, batch_idx):
         # current_lr = self.optimizers().param_groups[0]['lr']
         images, targets = batch
-        targets = targets.long()
         outputs = self(images)
         loss = self.loss(outputs, targets)
         self.log_metrics(outputs, targets, prefix="train")
@@ -55,7 +54,6 @@ class LightningTask(LightningModule):
 
     def validation_step(self, batch, batch_idx):
         images, targets = batch
-        targets = targets.long()
         outputs = self(images)
         loss = self.loss(outputs, targets)
         self.log_metrics(outputs, targets, prefix="val")
@@ -63,7 +61,6 @@ class LightningTask(LightningModule):
 
     def test_step(self, batch, batch_idx):
         images, targets = batch
-        targets = targets.long()
         outputs = self(images)
         loss = self.loss(outputs, targets)
         self.log_metrics(outputs, targets, prefix="test")

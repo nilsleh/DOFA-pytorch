@@ -31,7 +31,7 @@ class RegDataAugmentation(torch.nn.Module):
     def forward(self, batch: dict[str,]):
         """Torchgeo returns a dictionary with 'image' and 'label' keys, but engine expects a tuple"""
         x_out = self.transform(batch["image"]).squeeze(0)
-        return x_out, batch["label"]
+        return x_out, batch["label"].float()
 
 class DigitalTyphoonDataset:
     """Digital Typhoon dataset wrapper.
@@ -53,8 +53,11 @@ class DigitalTyphoonDataset:
         train_transform = RegDataAugmentation(split="train", size=self.img_size)
         eval_transform = RegDataAugmentation(split="test", size=self.img_size)
 
+        # dataset has argument sequence length which actually dictates the number of channels
+        # commonly in literature is used 3 channels and pretend it is RGB
+        # sequence_length: length of the sequence to return
         dm = DigitalTyphoonDataModule(
-            root=self.root_dir, download=False
+            root=self.root_dir,
         )
         # use the splits implemented in torchgeo
         dm.setup('fit')
