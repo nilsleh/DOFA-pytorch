@@ -90,11 +90,9 @@ def main(cfg: DictConfig):
         num_workers=cfg.num_workers,
         pin_memory=cfg.pin_mem,
     )
-    data_module.setup()
 
     # Create model (assumed to be a LightningModule)
     model = create_model(cfg, cfg.model, cfg.dataset)
-
 
     print_trainable_parameters(model)
 
